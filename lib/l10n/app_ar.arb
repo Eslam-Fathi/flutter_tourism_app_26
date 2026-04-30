@@ -1,0 +1,57 @@
+{
+  "@@locale": "ar",
+  "appTitle": "سياحة",
+  "explore": "اكتشف",
+  "bookings": "حجوزاتي",
+  "messages": "الرسائل",
+  "profile": "الملف الشخصي",
+  "home": "الرئيسية",
+  "searchDestinations": "ابحث عن وجهات...",
+  "browseByCategory": "تصفح حسب الفئة",
+  "popularThisWeek": "شائع هذا الأسبوع",
+  "bookNow": "احجز الآن",
+  "addToFavorites": "إضافة للمفضلة",
+  "myFavorites": "مفضلتي",
+
+  "hiTraveller": "أهلاً، مسافر",
+  "signInForFullAccess": "سجل الدخول للوصول الكامل",
+  "whereToNext": "إلى أين الوجهة التالية؟",
+  "discoverYour": "اكتشف",
+  "dreamGetaway": "ملاذك المفضل",
+  "trendingServices": "الخدمات الرائجة",
+  "ancientHistory": "التاريخ القديم",
+  "seeAll": "عرض الكل",
+
+  "filter": "تصفية",
+  "priceRange": "نطاق السعر",
+  "applyFilters": "تطبيق التصفية",
+  "noResults": "لا توجد نتائج.",
+
+  "trips": "رحلات",
+  "favorites": "المفضلة",
+  "reviews": "المراجعات",
+  "editProfile": "تعديل الملف الشخصي",
+  "paymentMethods": "طرق الدفع",
+  "notifications": "الإشعارات",
+  "darkMode": "الوضع الداكن",
+  "settings": "الإعدادات",
+  "helpSupport": "المساعدة والدعم",
+  "aboutApp": "عن سياحة",
+  "logOut": "تسجيل الخروج",
+
+  "preferences": "التفضيلات",
+  "language": "اللغة",
+
+  "noFavoritesYet": "لا توجد مفضلة بعد",
+  "startExploringFavorites": "ابدأ الاستكشاف واحفظ أماكنك المفضلة!",
+
+  "about": "نبذة",
+  "gallery": "المعرض",
+  "perPerson": "للشخص الواحد",
+
+  "categoryAll": "الكل",
+  "categoryBeach": "شواطئ",
+  "categoryMountain": "جبال",
+  "categoryCulture": "ثقافة",
+  "categoryCity": "مدينة"
+}

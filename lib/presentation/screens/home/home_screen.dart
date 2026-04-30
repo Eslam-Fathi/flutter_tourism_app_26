@@ -7,10 +7,12 @@ import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/core/widgets/section_header.dart';
 import 'package:flutter_tourism_app_26/core/widgets/shimmer_loader.dart';
 import 'package:flutter_tourism_app_26/data/models/article_model.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/service/service_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/service/service_details_screen.dart';
 import 'package:flutter_tourism_app_26/presentation/widgets/article_card.dart';
+import 'package:flutter_tourism_app_26/presentation/screens/home/article_details_screen.dart';
 import 'package:flutter_tourism_app_26/presentation/widgets/trending_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,15 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedCategoryIndex = 0;
-
-  final List<Map<String, dynamic>> _categories = [
-    {'label': 'All', 'icon': Icons.apps_rounded},
-    {'label': 'Beach', 'icon': Icons.beach_access},
-    {'label': 'Mountain', 'icon': Icons.terrain},
-    {'label': 'Culture', 'icon': Icons.account_balance},
-    {'label': 'Adventure', 'icon': Icons.hiking},
-    {'label': 'Food', 'icon': Icons.restaurant},
-  ];
 
   void _showGuestPopup(BuildContext context) {
     showDialog(
@@ -58,9 +51,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final servicesAsync = ref.watch(serviceNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
     final isGuest = authState.status == AuthStatus.guest;
+
+    final List<Map<String, dynamic>> _categories = [
+      {'label': l10n.categoryAll, 'icon': Icons.apps_rounded},
+      {'label': l10n.categoryBeach, 'icon': Icons.beach_access},
+      {'label': l10n.categoryMountain, 'icon': Icons.terrain},
+      {'label': l10n.categoryCulture, 'icon': Icons.account_balance},
+      {'label': 'Adventure', 'icon': Icons.hiking},
+      {'label': 'Food', 'icon': Icons.restaurant},
+    ];
 
     final hp = Responsive.horizontalPadding(context);
     final maxW = Responsive.contentMaxWidth(context);
@@ -150,7 +153,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         background: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.asset('assets/images/hero.png', fit: BoxFit.cover),
+                            Image.asset(
+                              'assets/images/hero.png',
+                              fit: BoxFit.cover,
+                            ),
                             DecoratedBox(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -173,15 +179,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Discover Your',
+                                    l10n.discoverYour,
                                     style: TextStyle(
                                       fontSize: isDesktop ? 14 : 12,
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   Text(
-                                    'Dream Getaway',
+                                    l10n.dreamGetaway,
                                     style: TextStyle(
                                       fontSize: isDesktop ? 26 : 22,
                                       color: Colors.white,
@@ -231,7 +239,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppColors.primary
-                                  : Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+                                  : Theme.of(context).colorScheme.surface
+                                        .withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
@@ -288,8 +297,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   maxWidth: maxW,
                   hp: hp,
                   child: SectionHeader(
-                    title: 'Trending Now',
-                    actionLabel: 'See All',
+                    title: l10n.trendingServices,
+                    actionLabel: l10n.seeAll,
                     onAction: () {},
                   ),
                 ),
@@ -298,60 +307,94 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
               SliverToBoxAdapter(
-                child: servicesAsync.when(
-                  data: (services) => isDesktop
-                      ? _centeredContent(
-                          maxWidth: maxW,
-                          hp: hp,
-                          child: Wrap(
-                            spacing: 16,
-                            runSpacing: 16,
-                            children: services
-                                .take(6)
-                                .map(
-                                  (service) => SizedBox(
-                                    width: trendingCardWidth,
-                                    height: trendingHeight,
-                                    child: TrendingCard(
-                                      service: service,
-                                      onTap: () => _handleServiceTap(
-                                        context,
-                                        service,
-                                        isGuest,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
+                child: _centeredContent(
+                  maxWidth: maxW,
+                  hp: hp,
+                  child: servicesAsync.when(
+                    data: (services) {
+                      if (services.isEmpty) {
+                        return Center(
+                          child: Text(
+                            l10n.noResults,
+                            style: TextStyle(color: Colors.white54),
                           ),
-                        )
-                      : SizedBox(
+                        );
+                      }
+                      if (isDesktop) {
+                        return Wrap(
+                          spacing: 24,
+                          runSpacing: 24,
+                          children: services.map((s) {
+                            return SizedBox(
+                              width: trendingCardWidth,
+                              height: trendingHeight,
+                              child: TrendingCard(
+                                service: s,
+                                onTap: () {
+                                  if (isGuest) {
+                                    _showGuestPopup(context);
+                                    return;
+                                  }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (ctx) =>
+                                          ServiceDetailsScreen(service: s),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      } else {
+                        return SizedBox(
                           height: trendingHeight,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
+                            clipBehavior: Clip.none,
                             padding: EdgeInsets.symmetric(horizontal: hp),
                             itemCount: services.length,
                             itemBuilder: (context, index) {
-                              final service = services[index];
-                              return TrendingCard(
-                                service: service,
-                                onTap: () => _handleServiceTap(
-                                  context,
-                                  service,
-                                  isGuest,
+                              final s = services[index];
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  right: index == services.length - 1 ? 0 : 20,
+                                ),
+                                child: SizedBox(
+                                  width: trendingCardWidth,
+                                  child: TrendingCard(
+                                    service: s,
+                                    onTap: () {
+                                      if (isGuest) {
+                                        _showGuestPopup(context);
+                                        return;
+                                      }
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (ctx) =>
+                                              ServiceDetailsScreen(service: s),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               );
                             },
                           ),
-                        ),
-                  loading: () => ShimmerCardList(
-                    count: 4,
-                    cardWidth: trendingCardWidth,
-                    cardHeight: trendingHeight,
-                  ),
-                  error: (err, _) => _ErrorState(
-                    onRetry: () =>
-                        ref.read(serviceNotifierProvider.notifier).refresh(),
+                        );
+                      }
+                    },
+                    loading: () => ShimmerCardList(
+                      count: 4,
+                      cardWidth: trendingCardWidth,
+                      cardHeight: trendingHeight,
+                    ),
+                    error: (err, _) => _ErrorState(
+                      onRetry: () =>
+                          ref.read(serviceNotifierProvider.notifier).refresh(),
+                    ),
                   ),
                 ),
               ),
@@ -379,8 +422,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   maxWidth: maxW,
                   hp: hp,
                   child: SectionHeader(
-                    title: 'Ancient Stories',
-                    actionLabel: 'Read More',
+                    title: l10n.ancientHistory,
+                    actionLabel: l10n.seeAll,
                     onAction: () {},
                   ),
                 ),
@@ -401,7 +444,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 (a) => SizedBox(
                                   width: 300,
                                   height: 380,
-                                  child: ArticleCard(article: a, onTap: () {}),
+                                  child: ArticleCard(
+                                    article: a,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ArticleDetailsScreen(article: a),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               )
                               .toList(),
@@ -415,7 +469,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           itemCount: mockArticles.length,
                           itemBuilder: (context, index) => ArticleCard(
                             article: mockArticles[index],
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ArticleDetailsScreen(
+                                    article: mockArticles[index],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),

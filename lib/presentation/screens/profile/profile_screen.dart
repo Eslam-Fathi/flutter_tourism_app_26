@@ -2,87 +2,116 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/theme/theme_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/booking/booking_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/interaction/interaction_provider.dart';
 import '../chat/conversations_screen.dart';
+import 'favorites_list_screen.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authNotifierProvider);
     final themeMode = ref.watch(themeNotifierProvider);
     final bookingsState = ref.watch(bookingNotifierProvider);
     final favState = ref.watch(favoriteNotifierProvider);
-    
+
     final user = authState.user;
     final tripsCount = bookingsState.valueOrNull?.length ?? 0;
     final favCount = favState.valueOrNull?.length ?? 0;
 
     final List<_MenuItem> menuItems = [
       _MenuItem(
-          icon: Icons.person_outline,
-          label: 'Edit Profile',
-          color: AppColors.primary,
-          onTap: () {}),
+        icon: Icons.person_outline,
+        label: l10n.editProfile,
+        color: AppColors.primary,
+        onTap: () {},
+      ),
       _MenuItem(
-          icon: Icons.chat_bubble_outline,
-          label: 'Messages',
-          color: AppColors.primary,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ConversationsScreen(),
-              ),
-            );
-          }),
+        icon: Icons.chat_bubble_outline,
+        label: l10n.messages,
+        color: AppColors.primary,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ConversationsScreen(),
+            ),
+          );
+        },
+      ),
       _MenuItem(
-          icon: Icons.favorite_outline,
-          label: 'My Favorites',
-          color: Colors.pinkAccent,
-          onTap: () {}),
+        icon: Icons.favorite_outline,
+        label: l10n.myFavorites,
+        color: Colors.pinkAccent,
+        onTap: () {
+          // Navigate to the FavoritesListScreen when tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FavoritesListScreen(),
+            ),
+          );
+        },
+      ),
       _MenuItem(
-          icon: Icons.credit_card_outlined,
-          label: 'Payment Methods',
-          color: AppColors.success,
-          onTap: () {}),
+        icon: Icons.credit_card_outlined,
+        label: l10n.paymentMethods,
+        color: AppColors.success,
+        onTap: () {},
+      ),
       _MenuItem(
-          icon: Icons.notifications_outlined,
-          label: 'Notifications',
-          color: AppColors.warning,
-          onTap: () {}),
+        icon: Icons.notifications_outlined,
+        label: l10n.notifications,
+        color: AppColors.warning,
+        onTap: () {},
+      ),
       _MenuItem(
-          icon: themeMode == ThemeMode.dark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
-          label: 'Dark Mode',
-          color: AppColors.primary,
-          trailing: Switch.adaptive(
-            value: themeMode == ThemeMode.dark,
-            onChanged: (val) {
-              ref.read(themeNotifierProvider.notifier).toggleTheme();
-            },
-          ),
-          onTap: () {
+        icon: themeMode == ThemeMode.dark
+            ? Icons.dark_mode_outlined
+            : Icons.light_mode_outlined,
+        label: l10n.darkMode,
+        color: AppColors.primary,
+        trailing: Switch.adaptive(
+          value: themeMode == ThemeMode.dark,
+          onChanged: (val) {
             ref.read(themeNotifierProvider.notifier).toggleTheme();
-          }),
+          },
+        ),
+        onTap: () {
+          ref.read(themeNotifierProvider.notifier).toggleTheme();
+        },
+      ),
       _MenuItem(
-          icon: Icons.settings_outlined,
-          label: 'Settings',
-          color: AppColors.secondary,
-          onTap: () {}),
+        icon: Icons.settings_outlined,
+        label: l10n.settings,
+        color: AppColors.secondary,
+        onTap: () {
+          // Navigate to SettingsScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SettingsScreen()),
+          );
+        },
+      ),
       _MenuItem(
-          icon: Icons.help_outline,
-          label: 'Help & Support',
-          color: AppColors.textMuted,
-          onTap: () {}),
+        icon: Icons.help_outline,
+        label: l10n.helpSupport,
+        color: AppColors.textMuted,
+        onTap: () {},
+      ),
       _MenuItem(
-          icon: Icons.info_outline,
-          label: 'About SeYaha',
-          color: AppColors.textMuted,
-          onTap: () {}),
+        icon: Icons.info_outline,
+        label: l10n.aboutApp,
+        color: AppColors.textMuted,
+        onTap: () {},
+      ),
     ];
 
     return Scaffold(
@@ -103,9 +132,9 @@ class ProfileScreen extends ConsumerWidget {
                         children: [
                           CircleAvatar(
                             radius: 52,
-                            backgroundColor:
-                                Colors.white.withOpacity(0.3),
-                            child: user?.avatar != null && user!.avatar!.isNotEmpty
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            child:
+                                user?.avatar != null && user!.avatar!.isNotEmpty
                                 ? ClipOval(
                                     child: Image.network(
                                       user.avatar!,
@@ -149,13 +178,11 @@ class ProfileScreen extends ConsumerWidget {
                       // Name & email
                       Text(
                         user?.name ?? 'Guest Explorer',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
+                        style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -171,19 +198,22 @@ class ProfileScreen extends ConsumerWidget {
                       // Role badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 5),
+                          horizontal: 14,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: Colors.white.withOpacity(0.3)),
+                            color: Colors.white.withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           user?.role == 'Admin'
                               ? '👑 Administrator'
                               : user != null
-                                  ? '✈️ Traveller'
-                                  : '👀 Guest',
+                              ? '✈️ Traveller'
+                              : '👀 Guest',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -197,37 +227,44 @@ class ProfileScreen extends ConsumerWidget {
                       // Stats row
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 24),
+                          vertical: 20,
+                          horizontal: 24,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                              color: Colors.white.withOpacity(0.2)),
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                         ),
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _StatItem(
-                                value: tripsCount.toString(),
-                                label: 'Trips',
-                                icon: Icons.flight_takeoff),
+                              value: tripsCount.toString(),
+                              label: l10n.trips,
+                              icon: Icons.flight_takeoff,
+                            ),
                             Container(
-                                width: 1,
-                                height: 40,
-                                color: Colors.white.withOpacity(0.2)),
+                              width: 1,
+                              height: 40,
+                              color: Colors.white.withOpacity(0.2),
+                            ),
                             _StatItem(
-                                value: favCount.toString(),
-                                label: 'Favorites',
-                                icon: Icons.favorite_outline),
+                              value: favCount.toString(),
+                              label: l10n.favorites,
+                              icon: Icons.favorite_outline,
+                            ),
                             Container(
-                                width: 1,
-                                height: 40,
-                                color: Colors.white.withOpacity(0.2)),
+                              width: 1,
+                              height: 40,
+                              color: Colors.white.withOpacity(0.2),
+                            ),
                             _StatItem(
-                                value: '0',
-                                label: 'Reviews',
-                                icon: Icons.star_outline),
+                              value: '0',
+                              label: l10n.reviews,
+                              icon: Icons.star_outline,
+                            ),
                           ],
                         ),
                       ),
@@ -255,10 +292,7 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
                 child: Column(
-                  children: menuItems
-                      .asMap()
-                      .entries
-                      .map((entry) {
+                  children: menuItems.asMap().entries.map((entry) {
                     final i = entry.key;
                     final item = entry.value;
                     return Column(
@@ -272,8 +306,7 @@ class ProfileScreen extends ConsumerWidget {
                               color: item.color.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(item.icon,
-                                color: item.color, size: 20),
+                            child: Icon(item.icon, color: item.color, size: 20),
                           ),
                           title: Text(
                             item.label,
@@ -283,13 +316,17 @@ class ProfileScreen extends ConsumerWidget {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
-                          trailing: item.trailing ?? const Icon(
-                            Icons.chevron_right,
-                            color: AppColors.textMuted,
-                            size: 20,
-                          ),
+                          trailing:
+                              item.trailing ??
+                              const Icon(
+                                Icons.chevron_right,
+                                color: AppColors.textMuted,
+                                size: 20,
+                              ),
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 4),
+                            horizontal: 20,
+                            vertical: 4,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
@@ -317,18 +354,19 @@ class ProfileScreen extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.error,
-                    side: const BorderSide(
-                        color: AppColors.error, width: 1.5),
+                    side: const BorderSide(color: AppColors.error, width: 1.5),
                     minimumSize: const Size(double.infinity, 54),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   icon: const Icon(Icons.logout),
-                  label: const Text(
-                    'Log Out',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15),
+                  label: Text(
+                    l10n.logOut,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                   onPressed: () =>
                       ref.read(authNotifierProvider.notifier).logout(),
@@ -371,10 +409,7 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
         ),
       ],
     );

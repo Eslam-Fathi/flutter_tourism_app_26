@@ -1,0 +1,60 @@
+{
+  "@@locale": "en",
+  "appTitle": "SeYaha Tourism",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "explore": "Explore",
+  "bookings": "Bookings",
+  "messages": "Messages",
+  "profile": "Profile",
+  "home": "Home",
+  "searchDestinations": "Search destinations…",
+  "browseByCategory": "Browse by Category",
+  "popularThisWeek": "Popular This Week",
+  "bookNow": "Book Now",
+  "addToFavorites": "Add to Favorites",
+  "myFavorites": "My Favorites",
+
+  "hiTraveller": "Hi, Traveller",
+  "signInForFullAccess": "Sign in for full access",
+  "whereToNext": "Where to next?",
+  "discoverYour": "Discover Your",
+  "dreamGetaway": "Dream Getaway",
+  "trendingServices": "Trending Services",
+  "ancientHistory": "Ancient History",
+  "seeAll": "See All",
+  
+  "filter": "Filter",
+  "priceRange": "Price Range",
+  "applyFilters": "Apply Filters",
+  "noResults": "No results found.",
+
+  "trips": "Trips",
+  "favorites": "Favorites",
+  "reviews": "Reviews",
+  "editProfile": "Edit Profile",
+  "paymentMethods": "Payment Methods",
+  "notifications": "Notifications",
+  "darkMode": "Dark Mode",
+  "settings": "Settings",
+  "helpSupport": "Help & Support",
+  "aboutApp": "About SeYaha",
+  "logOut": "Log Out",
+
+  "preferences": "Preferences",
+  "language": "Language",
+
+  "noFavoritesYet": "No favorites yet",
+  "startExploringFavorites": "Start exploring and save your favorite places!",
+
+  "about": "About",
+  "gallery": "Gallery",
+  "perPerson": "Per person",
+  
+  "categoryAll": "All",
+  "categoryBeach": "Beach",
+  "categoryMountain": "Mountain",
+  "categoryCulture": "Culture",
+  "categoryCity": "City"
+}

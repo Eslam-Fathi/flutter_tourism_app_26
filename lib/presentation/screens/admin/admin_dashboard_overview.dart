@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'create_company_screen.dart';
 
 class AdminDashboardOverview extends StatelessWidget {
   const AdminDashboardOverview({super.key});
@@ -40,6 +42,20 @@ class AdminDashboardOverview extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Navigate to company creation screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateCompanyScreen(),
+            ),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.add_business, color: Colors.white),
+        label: const Text('Add Company', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -119,6 +135,7 @@ class AdminDashboardOverview extends StatelessWidget {
   Widget _buildRevenueChart() {
     return Container(
       padding: const EdgeInsets.all(20),
+      height: 250,
       decoration: BoxDecoration(
         color: AppColors.surfaceDark.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(20),
@@ -136,20 +153,59 @@ class AdminDashboardOverview extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            height: 120,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildBar('Mon', 0.4),
-                _buildBar('Tue', 0.6),
-                _buildBar('Wed', 0.3),
-                _buildBar('Thu', 0.8),
-                _buildBar('Fri', 0.5),
-                _buildBar('Sat', 0.9),
-                _buildBar('Sun', 0.7),
-              ],
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      getTitlesWidget: _bottomTitleWidgets,
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 6,
+                minY: 0,
+                maxY: 6,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: const [
+                      FlSpot(0, 3),
+                      FlSpot(1, 1),
+                      FlSpot(2, 4),
+                      FlSpot(3, 2),
+                      FlSpot(4, 5),
+                      FlSpot(5, 3.5),
+                      FlSpot(6, 6),
+                    ],
+                    isCurved: true,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.secondary],
+                    ),
+                    barWidth: 4,
+                    isStrokeCapRound: true,
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.3),
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -157,28 +213,43 @@ class AdminDashboardOverview extends StatelessWidget {
     );
   }
 
-  Widget _buildBar(String label, double fill) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 24,
-          height: 90 * fill,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
-        ),
-      ],
+  static Widget _bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      color: Colors.white54,
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 0:
+        text = const Text('Mon', style: style);
+        break;
+      case 1:
+        text = const Text('Tue', style: style);
+        break;
+      case 2:
+        text = const Text('Wed', style: style);
+        break;
+      case 3:
+        text = const Text('Thu', style: style);
+        break;
+      case 4:
+        text = const Text('Fri', style: style);
+        break;
+      case 5:
+        text = const Text('Sat', style: style);
+        break;
+      case 6:
+        text = const Text('Sun', style: style);
+        break;
+      default:
+        text = const Text('', style: style);
+        break;
+    }
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      child: text,
     );
   }
 

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/providers/auth/auth_provider.dart';
 import 'presentation/providers/theme/theme_provider.dart';
+import 'presentation/providers/theme/locale_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/onboarding_screen.dart';
 import 'presentation/screens/main_wrapper.dart';
@@ -19,6 +22,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
     final themeMode = ref.watch(themeNotifierProvider);
+    final locale = ref.watch(localeNotifierProvider);
 
     return MaterialApp(
       title: 'SeYaha Tourism',
@@ -26,6 +30,14 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       home: _getHome(authState),
     );
   }

@@ -2,9 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import '../../../data/models/service_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../bookings/booking_form_screen.dart';
 
 class ServiceDetailsScreen extends ConsumerStatefulWidget {
   final TourismService service;
@@ -61,6 +63,7 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
@@ -79,16 +82,16 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                 fit: StackFit.expand,
                 children: [
                   _imageUrl.isEmpty
-                      ? Image.asset('assets/images/bali.png',
-                          fit: BoxFit.cover)
+                      ? Image.asset('assets/images/bali.png', fit: BoxFit.cover)
                       : CachedNetworkImage(
                           imageUrl: _imageUrl,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) => Container(
-                              color: AppColors.shimmerBase),
+                          placeholder: (_, __) =>
+                              Container(color: AppColors.shimmerBase),
                           errorWidget: (_, __, ___) => Image.asset(
-                              'assets/images/bali.png',
-                              fit: BoxFit.cover),
+                            'assets/images/bali.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                   // Gradient scrim
                   const DecoratedBox(
@@ -122,8 +125,9 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                 child: Container(
                   decoration: const BoxDecoration(
                     color: AppColors.background,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(36)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(36),
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
@@ -148,19 +152,25 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 5),
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
-                                color: (AppColors.categoryColors[
-                                            widget.service.category] ??
-                                        AppColors.primary)
-                                    .withOpacity(0.12),
+                                color:
+                                    (AppColors.categoryColors[widget
+                                                .service
+                                                .category] ??
+                                            AppColors.primary)
+                                        .withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 widget.service.category,
                                 style: TextStyle(
-                                  color: AppColors.categoryColors[
-                                          widget.service.category] ??
+                                  color:
+                                      AppColors.categoryColors[widget
+                                          .service
+                                          .category] ??
                                       AppColors.primary,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -168,8 +178,11 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               ),
                             ),
                             const Spacer(),
-                            const Icon(Icons.star_rounded,
-                                color: Colors.amber, size: 18),
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.amber,
+                              size: 18,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               '${widget.service.rating.toStringAsFixed(1)} (${widget.service.reviewsCount})',
@@ -185,21 +198,22 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                         // Title
                         Text(
                           widget.service.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
+                          style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
                         ),
                         const SizedBox(height: 10),
 
                         // Location
                         Row(
                           children: [
-                            const Icon(Icons.location_on,
-                                color: AppColors.primary, size: 16),
+                            const Icon(
+                              Icons.location_on,
+                              color: AppColors.primary,
+                              size: 16,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               widget.service.location,
@@ -261,10 +275,10 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                             ),
-                            tabs: const [
-                              Tab(text: 'Overview'),
-                              Tab(text: 'Itinerary'),
-                              Tab(text: 'Reviews'),
+                            tabs: [
+                              Tab(text: l10n.about),
+                              const Tab(text: 'Itinerary'),
+                              Tab(text: l10n.reviews),
                             ],
                           ),
                         ),
@@ -293,14 +307,17 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                 physics: const NeverScrollableScrollPhysics(),
                                 children: const [
                                   _ItineraryItem(
-                                      day: 1,
-                                      title: 'Arrival & Welcome Tour'),
+                                    day: 1,
+                                    title: 'Arrival & Welcome Tour',
+                                  ),
                                   _ItineraryItem(
-                                      day: 2,
-                                      title: 'Main Attractions Visit'),
+                                    day: 2,
+                                    title: 'Main Attractions Visit',
+                                  ),
                                   _ItineraryItem(
-                                      day: 3,
-                                      title: 'Cultural Immersion Day'),
+                                    day: 3,
+                                    title: 'Cultural Immersion Day',
+                                  ),
                                 ],
                               ),
                               // Reviews tab
@@ -308,12 +325,18 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.rate_review_outlined,
-                                        size: 36, color: AppColors.textMuted),
+                                    Icon(
+                                      Icons.rate_review_outlined,
+                                      size: 36,
+                                      color: AppColors.textMuted,
+                                    ),
                                     SizedBox(height: 8),
-                                    Text('Reviews coming soon',
-                                        style:
-                                            TextStyle(color: AppColors.textMuted)),
+                                    Text(
+                                      'Reviews coming soon',
+                                      style: TextStyle(
+                                        color: AppColors.textMuted,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -330,17 +353,18 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               color: AppColors.primary.withOpacity(0.06),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                  color:
-                                      AppColors.primary.withOpacity(0.2)),
+                                color: AppColors.primary.withOpacity(0.2),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.calendar_month_outlined,
-                                    color: AppColors.primary),
+                                const Icon(
+                                  Icons.calendar_month_outlined,
+                                  color: AppColors.primary,
+                                ),
                                 const SizedBox(width: 12),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text(
                                       'Select Dates',
@@ -367,8 +391,10 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                   ],
                                 ),
                                 const Spacer(),
-                                const Icon(Icons.chevron_right,
-                                    color: AppColors.primary),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: AppColors.primary,
+                                ),
                               ],
                             ),
                           ),
@@ -392,7 +418,9 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8),
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     _CircleNavBtn(
@@ -400,19 +428,14 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                       onTap: () => Navigator.pop(context),
                     ),
                     const Spacer(),
-                    _CircleNavBtn(
-                      icon: Icons.share_outlined,
-                      onTap: () {},
-                    ),
+                    _CircleNavBtn(icon: Icons.share_outlined, onTap: () {}),
                     const SizedBox(width: 10),
                     _CircleNavBtn(
                       icon: _isFavorited
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      iconColor:
-                          _isFavorited ? Colors.redAccent : Colors.white,
-                      onTap: () =>
-                          setState(() => _isFavorited = !_isFavorited),
+                      iconColor: _isFavorited ? Colors.redAccent : Colors.white,
+                      onTap: () => setState(() => _isFavorited = !_isFavorited),
                     ),
                   ],
                 ),
@@ -426,18 +449,17 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
             left: 0,
             right: 0,
             child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(30)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(30),
+              ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(
-                      24, 20, 24, 20 + bottomPad),
+                  padding: EdgeInsets.fromLTRB(24, 20, 24, 20 + bottomPad),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.92),
                     border: Border(
-                      top: BorderSide(
-                          color: Colors.white.withOpacity(0.5)),
+                      top: BorderSide(color: Colors.white.withOpacity(0.5)),
                     ),
                   ),
                   child: Row(
@@ -461,9 +483,9 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               color: AppColors.accent,
                             ),
                           ),
-                          const Text(
-                            'per person',
-                            style: TextStyle(
+                          Text(
+                            l10n.perPerson,
+                            style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textMuted,
                             ),
@@ -477,16 +499,12 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  Color(0xFF4338CA),
-                                ],
+                                colors: [AppColors.primary, Color(0xFF4338CA)],
                               ),
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary
-                                      .withOpacity(0.4),
+                                  color: AppColors.primary.withOpacity(0.4),
                                   blurRadius: 14,
                                   offset: const Offset(0, 6),
                                 ),
@@ -500,10 +518,21 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                   borderRadius: BorderRadius.circular(22),
                                 ),
                               ),
-                              onPressed: () {},
-                              child: const Text(
-                                'Book Experience',
-                                style: TextStyle(
+                              onPressed: () {
+                                // Navigate to the full booking form screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => BookingFormScreen(
+                                      service: widget.service,
+                                      initialDates: _selectedDates,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                l10n.bookNow,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -550,11 +579,9 @@ class _CircleNavBtn extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.3),
               shape: BoxShape.circle,
-              border: Border.all(
-                  color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
             ),
-            child: Icon(icon,
-                color: iconColor ?? Colors.white, size: 20),
+            child: Icon(icon, color: iconColor ?? Colors.white, size: 20),
           ),
         ),
       ),
