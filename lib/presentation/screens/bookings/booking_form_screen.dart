@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/models/service_model.dart';
 import '../../../core/widgets/aurora_background.dart';
 import '../../providers/booking/booking_provider.dart';
+import 'payment_screen.dart';
 
 /// Screen for creating a new booking for a specific service.
 /// Uses the AuroraBackground for a premium look and feel.
@@ -80,47 +81,33 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     }
   }
 
-  /// Handles the booking submission
-  Future<void> _submitBooking() async {
-    setState(() => _isSubmitting = true);
+  /// Handles the booking submission by navigating to the Payment screen
+  void _submitBooking() {
+    // Prepare the booking data structure
+    final bookingData = {
+      'service': widget.service.id,
+      'dates': {
+        'startDate': _selectedDates.start.toIso8601String(),
+        'endDate': _selectedDates.end.toIso8601String(),
+      },
+      'guests': {
+        'adults': _adultsCount,
+        'children': _childrenCount,
+      },
+      'notes': _specialRequestsController.text,
+    };
 
-    try {
-      // Prepare the booking data structure
-      final bookingData = {
-        'service': widget.service.id,
-        'dates': {
-          'startDate': _selectedDates.start.toIso8601String(),
-          'endDate': _selectedDates.end.toIso8601String(),
-        },
-        'guests': {
-          'adults': _adultsCount,
-          'children': _childrenCount,
-        },
-        'specialRequests': _specialRequestsController.text,
-      };
-
-      // Call the booking provider to create the booking
-      await ref.read(bookingNotifierProvider.notifier).createBooking(bookingData);
-
-      if (mounted) {
-        // Show success and navigate back
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Booking created successfully!')),
-        );
-        Navigator.pop(context);
-        Navigator.pop(context); // Also pop the service details screen
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
-    }
+    // Navigate to the payment screen instead of creating the booking immediately
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentScreen(
+          service: widget.service,
+          bookingData: bookingData,
+          totalPrice: _totalPrice,
+        ),
+      ),
+    );
   }
 
   @override

@@ -7,22 +7,27 @@ import '../../providers/auth/auth_provider.dart';
 import 'admin_dashboard_overview.dart';
 import 'admin_users_screen.dart';
 import 'admin_companies_screen.dart';
+import 'admin_articles_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../../l10n/app_localizations.dart';
+
 
 // ── Nav destination model ─────────────────────────────────────────────────
 class _AdminNavDest {
   final IconData icon;
   final IconData activeIcon;
-  final String label;
+  final String Function(AppLocalizations) label;
   const _AdminNavDest({required this.icon, required this.activeIcon, required this.label});
 }
 
-const List<_AdminNavDest> _destinations = [
-  _AdminNavDest(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard_rounded, label: 'Overview'),
-  _AdminNavDest(icon: Icons.people_outline, activeIcon: Icons.people_rounded, label: 'Users'),
-  _AdminNavDest(icon: Icons.business_outlined, activeIcon: Icons.business_rounded, label: 'Companies'),
-  _AdminNavDest(icon: Icons.admin_panel_settings_outlined, activeIcon: Icons.admin_panel_settings_rounded, label: 'Admin'),
+final List<_AdminNavDest> _destinations = [
+  _AdminNavDest(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard_rounded, label: (l) => l.overview),
+  _AdminNavDest(icon: Icons.people_outline, activeIcon: Icons.people_rounded, label: (l) => l.users),
+  _AdminNavDest(icon: Icons.business_outlined, activeIcon: Icons.business_rounded, label: (l) => l.companies),
+  _AdminNavDest(icon: Icons.history_edu_outlined, activeIcon: Icons.history_edu_rounded, label: (l) => l.historical),
+  _AdminNavDest(icon: Icons.admin_panel_settings_outlined, activeIcon: Icons.admin_panel_settings_rounded, label: (l) => l.admin),
 ];
+
 
 // ── Main Wrapper ──────────────────────────────────────────────────────────
 class AdminMainWrapper extends ConsumerStatefulWidget {
@@ -47,6 +52,7 @@ class _AdminMainWrapperState extends ConsumerState<AdminMainWrapper> {
       const AdminDashboardOverview(),
       const AdminUsersScreen(),
       const AdminCompaniesScreen(),
+      const AdminArticlesScreen(),
       const ProfileScreen(), // Reuse profile for settings
     ];
 
@@ -131,7 +137,8 @@ class _DesktopAdminNavRail extends ConsumerWidget {
                         children: [
                           Icon(isSelected ? dest.activeIcon : dest.icon, color: isSelected ? Colors.redAccent : Colors.white54, size: 22),
                           const SizedBox(width: 14),
-                          Text(dest.label, style: TextStyle(color: isSelected ? Colors.white : Colors.white54, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 15)),
+                          Text(dest.label(AppLocalizations.of(context)!), style: TextStyle(color: isSelected ? Colors.white : Colors.white54, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, fontSize: 15)),
+
                         ],
                       ),
                     ),
@@ -191,59 +198,90 @@ class _BottomAdminNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomPad = MediaQuery.of(context).padding.bottom;
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: EdgeInsets.only(top: 10, left: 16, right: 16, bottom: 10 + bottomPad),
-          decoration: const BoxDecoration(
-            color: Color(0xF21B065E),
-            border: Border(top: BorderSide(color: Colors.white12)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(_destinations.length, (index) {
-              final dest = _destinations[index];
-              final isSelected = index == currentIndex;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => onTap(index),
-                  behavior: HitTestBehavior.translucent,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 220),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.redAccent.withValues(alpha: 0.15) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(
+    
+    return Container(
+      margin: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        bottom: bottomPad > 0 ? bottomPad : 16,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xE61B065E),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(_destinations.length, (index) {
+                final dest = _destinations[index];
+                final isSelected = index == currentIndex;
+                
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => onTap(index),
+                    behavior: HitTestBehavior.translucent,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
                           isSelected ? dest.activeIcon : dest.icon,
-                          color: isSelected ? Colors.redAccent : Colors.white54,
+                          color: isSelected
+                              ? Colors.redAccent
+                              : Colors.white.withValues(alpha: 0.4),
                           size: 24,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 220),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.redAccent : Colors.white54,
+                        const SizedBox(height: 4),
+                        AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 200),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.4),
+                          ),
+                          child: Text(dest.label(l10n)),
                         ),
-                        child: Text(dest.label),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: isSelected ? 4 : 0,
+                          height: 4,
+                          decoration: const BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
         ),
       ),
     );
   }
 }
+

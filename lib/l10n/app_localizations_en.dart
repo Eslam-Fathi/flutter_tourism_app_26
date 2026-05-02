@@ -27,6 +27,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get overview => 'Overview';
+
+  @override
+  String get users => 'Users';
+
+  @override
+  String get companies => 'Companies';
+
+  @override
+  String get historical => 'Historical';
+
+  @override
+  String get admin => 'Admin';
+
+  @override
+  String get tripPlans => 'Trip Plans';
+
+  @override
   String get searchDestinations => 'Search destinations…';
 
   @override
@@ -149,4 +167,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get categoryCity => 'City';
+
+  @override
+  String get categoryAdventure => 'Adventure';
+
+  @override
+  String get categoryFood => 'Food';
 }

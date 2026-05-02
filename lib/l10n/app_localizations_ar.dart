@@ -27,6 +27,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get home => 'الرئيسية';
 
   @override
+  String get overview => 'نظرة عامة';
+
+  @override
+  String get users => 'المستخدمين';
+
+  @override
+  String get companies => 'الشركات';
+
+  @override
+  String get historical => 'التاريخي';
+
+  @override
+  String get admin => 'المسؤول';
+
+  @override
+  String get tripPlans => 'خطط الرحلات';
+
+  @override
   String get searchDestinations => 'ابحث عن وجهات...';
 
   @override
@@ -148,4 +166,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get categoryCity => 'مدينة';
+
+  @override
+  String get categoryAdventure => 'مغامرة';
+
+  @override
+  String get categoryFood => 'طعام';
 }

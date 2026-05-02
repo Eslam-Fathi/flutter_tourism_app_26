@@ -147,14 +147,32 @@ class _ServiceDetailsProviderElement
   String get id => (origin as ServiceDetailsProvider).id;
 }
 
-String _$serviceNotifierHash() => r'81c594f8c78ea926e36f7573fa13ab6f415326f3';
+String _$companyServicesHash() => r'2a9ed3092329be9fd0872f59bd5c1fd1a9fed326';
+
+/// See also [companyServices].
+@ProviderFor(companyServices)
+final companyServicesProvider =
+    AutoDisposeFutureProvider<List<TourismService>>.internal(
+      companyServices,
+      name: r'companyServicesProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$companyServicesHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CompanyServicesRef = AutoDisposeFutureProviderRef<List<TourismService>>;
+String _$serviceNotifierHash() => r'62df629599b9a2cb951ba7da0674325e7e96bb48';
 
 /// See also [ServiceNotifier].
 @ProviderFor(ServiceNotifier)
 final serviceNotifierProvider =
-    AutoDisposeNotifierProvider<
+    AutoDisposeAsyncNotifierProvider<
       ServiceNotifier,
-      AsyncValue<List<TourismService>>
+      List<TourismService>
     >.internal(
       ServiceNotifier.new,
       name: r'serviceNotifierProvider',
@@ -165,7 +183,6 @@ final serviceNotifierProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$ServiceNotifier =
-    AutoDisposeNotifier<AsyncValue<List<TourismService>>>;
+typedef _$ServiceNotifier = AutoDisposeAsyncNotifier<List<TourismService>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

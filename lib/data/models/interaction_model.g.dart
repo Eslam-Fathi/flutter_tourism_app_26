@@ -7,7 +7,7 @@ part of 'interaction_model.dart';
 // **************************************************************************
 
 _$ReviewImpl _$$ReviewImplFromJson(Map<String, dynamic> json) => _$ReviewImpl(
-  id: json['id'] as String,
+  id: json['_id'] as String,
   serviceId: json['service'] as String,
   user: User.fromJson(json['user'] as Map<String, dynamic>),
   rating: (json['rating'] as num).toInt(),
@@ -19,7 +19,7 @@ _$ReviewImpl _$$ReviewImplFromJson(Map<String, dynamic> json) => _$ReviewImpl(
 
 Map<String, dynamic> _$$ReviewImplToJson(_$ReviewImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'service': instance.serviceId,
       'user': instance.user,
       'rating': instance.rating,
@@ -29,7 +29,7 @@ Map<String, dynamic> _$$ReviewImplToJson(_$ReviewImpl instance) =>
 
 _$FavoriteImpl _$$FavoriteImplFromJson(Map<String, dynamic> json) =>
     _$FavoriteImpl(
-      id: json['id'] as String,
+      id: json['_id'] as String,
       service: TourismService.fromJson(json['service'] as Map<String, dynamic>),
       createdAt: json['createdAt'] == null
           ? null
@@ -38,7 +38,7 @@ _$FavoriteImpl _$$FavoriteImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$FavoriteImplToJson(_$FavoriteImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      '_id': instance.id,
       'service': instance.service,
       'createdAt': instance.createdAt?.toIso8601String(),
     };

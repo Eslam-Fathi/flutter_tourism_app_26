@@ -6,10 +6,27 @@ class CompanyRepository {
 
   CompanyRepository({required Dio dio}) : _dio = dio;
 
+  /// Fetches all companies for public use (may only return approved ones).
   Future<List<Company>> getCompanies() async {
     try {
       final response = await _dio.get('/api/companies');
-      return (response.data['data'] as List).map((e) => Company.fromJson(e)).toList();
+      final data = response.data['data'];
+      if (data == null) return [];
+      return (data as List).map((e) => Company.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  /// Fetches ALL companies for admin, including pending ones.
+  /// Tries with ?all=true query param first; falls back to standard endpoint.
+  Future<List<Company>> getAllCompaniesForAdmin() async {
+    try {
+      // Some backends expose a query param to return all statuses
+      final response = await _dio.get('/api/companies', queryParameters: {'all': 'true'});
+      final data = response.data['data'];
+      if (data == null) return [];
+      return (data as List).map((e) => Company.fromJson(e)).toList();
     } on DioException catch (e) {
       throw _handleError(e);
     }

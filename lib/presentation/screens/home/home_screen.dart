@@ -6,13 +6,15 @@ import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/core/widgets/section_header.dart';
 import 'package:flutter_tourism_app_26/core/widgets/shimmer_loader.dart';
-import 'package:flutter_tourism_app_26/data/models/article_model.dart';
+
 import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/service/service_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/service/service_details_screen.dart';
 import 'package:flutter_tourism_app_26/presentation/widgets/article_card.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/home/article_details_screen.dart';
+
+import 'package:flutter_tourism_app_26/presentation/providers/admin/article_management_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/widgets/trending_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -24,6 +26,15 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedCategoryIndex = 0;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
 
   void _showGuestPopup(BuildContext context) {
     showDialog(
@@ -56,14 +67,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final authState = ref.watch(authNotifierProvider);
     final isGuest = authState.status == AuthStatus.guest;
 
-    final List<Map<String, dynamic>> _categories = [
-      {'label': l10n.categoryAll, 'icon': Icons.apps_rounded},
-      {'label': l10n.categoryBeach, 'icon': Icons.beach_access},
-      {'label': l10n.categoryMountain, 'icon': Icons.terrain},
-      {'label': l10n.categoryCulture, 'icon': Icons.account_balance},
-      {'label': 'Adventure', 'icon': Icons.hiking},
-      {'label': 'Food', 'icon': Icons.restaurant},
+    final List<Map<String, dynamic>> categories = [
+      {'label': l10n.categoryAll, 'icon': Icons.apps_rounded, 'key': 'All'},
+      {'label': l10n.categoryBeach, 'icon': Icons.beach_access, 'key': 'Beach'},
+      {'label': l10n.categoryMountain, 'icon': Icons.terrain, 'key': 'Mountain'},
+      {'label': l10n.categoryCulture, 'icon': Icons.account_balance, 'key': 'Culture'},
+      {'label': l10n.categoryAdventure, 'icon': Icons.hiking, 'key': 'Adventure'},
+      {'label': l10n.categoryFood, 'icon': Icons.restaurant, 'key': 'Food'},
     ];
+
+
 
     final hp = Responsive.horizontalPadding(context);
     final maxW = Responsive.contentMaxWidth(context);
@@ -75,33 +88,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Card height for trending section
     final trendingCardWidth = isDesktop ? 260.0 : 220.0;
     final trendingHeight = isDesktop ? 340.0 : 310.0;
-
-    final List<HistoricArticle> mockArticles = [
-      HistoricArticle(
-        id: '1',
-        title: 'The Golden Age of Cairo: A Journey Through Time',
-        excerpt: 'Explore the rich history of medieval Cairo...',
-        imageUrl: 'assets/images/pyramids.png',
-        author: 'Ahmed Hassan',
-        publishedAt: DateTime.now(),
-      ),
-      HistoricArticle(
-        id: '2',
-        title: 'Pharaonic Secrets: The Hidden Valley of Kings',
-        excerpt: 'Uncovering the mysteries of the ancient rulers...',
-        imageUrl: 'assets/images/pyramids.png',
-        author: 'Sarah Jones',
-        publishedAt: DateTime.now(),
-      ),
-      HistoricArticle(
-        id: '3',
-        title: 'Bali: Island of the Gods and Ancient Temples',
-        excerpt: 'Discover the spiritual heart of Bali...',
-        imageUrl: 'assets/images/bali.png',
-        author: 'Maya Patel',
-        publishedAt: DateTime.now(),
-      ),
-    ];
 
     return Scaffold(
       body: AuroraBackground(
@@ -128,8 +114,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // this guarantees it never overlaps the hero image.
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(72),
-                  child: _SearchBar(maxWidth: maxW, hp: hp),
+                  child: _SearchBar(
+                    maxWidth: maxW,
+                    hp: hp,
+                    controller: _searchController,
+                    onChanged: (val) => setState(() => _searchQuery = val),
+                    onFilterTap: () => _showFilterSheet(context),
+                  ),
+
                 ),
+
                 // leading removed to unify navigation
                 actions: [
                   Padding(
@@ -222,9 +216,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: EdgeInsets.zero,
-                      itemCount: _categories.length,
+                      itemCount: categories.length,
                       itemBuilder: (context, index) {
-                        final cat = _categories[index];
+                        final cat = categories[index];
                         final isSelected = index == _selectedCategoryIndex;
                         return GestureDetector(
                           onTap: () =>
@@ -312,38 +306,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   hp: hp,
                   child: servicesAsync.when(
                     data: (services) {
-                      if (services.isEmpty) {
+                      // Filter logic
+                      final filteredServices = services.where((s) {
+                        final matchesCategory = _selectedCategoryIndex == 0 ||
+                            s.category.toLowerCase() == categories[_selectedCategoryIndex]['key'].toString().toLowerCase();
+                        final matchesSearch = _searchQuery.isEmpty ||
+
+                            s.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                            s.location.toLowerCase().contains(_searchQuery.toLowerCase());
+                        return matchesCategory && matchesSearch;
+                      }).toList();
+
+                      if (filteredServices.isEmpty) {
                         return Center(
-                          child: Text(
-                            l10n.noResults,
-                            style: TextStyle(color: Colors.white54),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(height: 40),
+                              Icon(Icons.search_off, size: 48, color: Colors.white24),
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.noResults,
+                                style: const TextStyle(color: Colors.white54, fontSize: 16),
+                              ),
+                            ],
                           ),
                         );
                       }
+                      
                       if (isDesktop) {
                         return Wrap(
                           spacing: 24,
                           runSpacing: 24,
-                          children: services.map((s) {
+                          children: filteredServices.map((s) {
                             return SizedBox(
                               width: trendingCardWidth,
                               height: trendingHeight,
                               child: TrendingCard(
                                 service: s,
-                                onTap: () {
-                                  if (isGuest) {
-                                    _showGuestPopup(context);
-                                    return;
-                                  }
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (ctx) =>
-                                          ServiceDetailsScreen(service: s),
-                                    ),
-                                  );
-                                },
+                                onTap: () => _handleServiceTap(context, s, isGuest),
                               ),
+
                             );
                           }).toList(),
                         );
@@ -354,31 +357,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             scrollDirection: Axis.horizontal,
                             clipBehavior: Clip.none,
                             padding: EdgeInsets.symmetric(horizontal: hp),
-                            itemCount: services.length,
+                            itemCount: filteredServices.length,
                             itemBuilder: (context, index) {
-                              final s = services[index];
+                              final s = filteredServices[index];
                               return Padding(
                                 padding: EdgeInsets.only(
-                                  right: index == services.length - 1 ? 0 : 20,
+                                  right: index == filteredServices.length - 1 ? 0 : 20,
                                 ),
                                 child: SizedBox(
                                   width: trendingCardWidth,
                                   child: TrendingCard(
                                     service: s,
-                                    onTap: () {
-                                      if (isGuest) {
-                                        _showGuestPopup(context);
-                                        return;
-                                      }
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (ctx) =>
-                                              ServiceDetailsScreen(service: s),
-                                        ),
-                                      );
-                                    },
+                                    onTap: () => _handleServiceTap(context, s, isGuest),
                                   ),
+
                                 ),
                               );
                             },
@@ -386,6 +378,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         );
                       }
                     },
+
                     loading: () => ShimmerCardList(
                       count: 4,
                       cardWidth: trendingCardWidth,
@@ -415,7 +408,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SliverToBoxAdapter(child: SizedBox(height: 40)),
 
               // ══════════════════════════════════════════════════
-              // ANCIENT STORIES
+              // ANCIENT STORIES (HISTORICAL ARTICLES)
               // ══════════════════════════════════════════════════
               SliverToBoxAdapter(
                 child: _centeredContent(
@@ -432,56 +425,90 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
               SliverToBoxAdapter(
-                child: isDesktop
-                    ? _centeredContent(
-                        maxWidth: maxW,
-                        hp: hp,
-                        child: Wrap(
-                          spacing: 20,
-                          runSpacing: 20,
-                          children: mockArticles
-                              .map(
-                                (a) => SizedBox(
-                                  width: 300,
-                                  height: 380,
-                                  child: ArticleCard(
-                                    article: a,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ArticleDetailsScreen(article: a),
-                                        ),
-                                      );
-                                    },
+                child: ref
+                    .watch(articleNotifierProvider)
+                    .when(
+                      data: (articles) {
+                        if (articles.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        if (isDesktop) {
+                          return _centeredContent(
+                            maxWidth: maxW,
+                            hp: hp,
+                            child: Wrap(
+                              spacing: 20,
+                              runSpacing: 20,
+                              children: articles
+                                  .map(
+                                    (a) => SizedBox(
+                                      width: 300,
+                                      height: 380,
+                                      child: ArticleCard(
+                                        article: a,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ArticleDetailsScreen(
+                                                    article: a,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          );
+                        } else {
+                          return SizedBox(
+                            height: 380,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              clipBehavior: Clip.none,
+                              padding: EdgeInsets.symmetric(horizontal: hp),
+                              itemCount: articles.length,
+                              itemBuilder: (context, index) {
+                                final a = articles[index];
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    right: index == articles.length - 1
+                                        ? 0
+                                        : 20,
                                   ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      )
-                    : SizedBox(
-                        height: 380,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: hp),
-                          itemCount: mockArticles.length,
-                          itemBuilder: (context, index) => ArticleCard(
-                            article: mockArticles[index],
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ArticleDetailsScreen(
-                                    article: mockArticles[index],
+                                  child: SizedBox(
+                                    width: 280,
+                                    child: ArticleCard(
+                                      article: a,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ArticleDetailsScreen(
+                                                  article: a,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      },
+                      loading: () => ShimmerCardList(
+                        count: 3,
+                        cardWidth: 280,
+                        cardHeight: 380,
                       ),
+                      error: (err, _) => const SizedBox.shrink(),
+                    ),
               ),
 
               // Bottom padding (accounts for bottom nav)
@@ -505,7 +532,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
   }
+
+  void _showFilterSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundDark,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          border: Border.all(color: Colors.white12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.filter,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close, color: Colors.white54),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.priceRange,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            RangeSlider(
+              values: const RangeValues(100, 800),
+              min: 0,
+              max: 1000,
+              divisions: 20,
+              activeColor: AppColors.primary,
+              inactiveColor: Colors.white10,
+              labels: const RangeLabels('\$100', '\$800'),
+              onChanged: (values) {},
+            ),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.applyFilters),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -554,11 +659,23 @@ class _CircleIconBtn extends StatelessWidget {
 class _SearchBar extends StatelessWidget {
   final double maxWidth;
   final double hp;
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onFilterTap;
 
-  const _SearchBar({required this.maxWidth, required this.hp});
+  const _SearchBar({
+    required this.maxWidth,
+    required this.hp,
+    required this.controller,
+    required this.onChanged,
+    required this.onFilterTap,
+  });
+
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Padding(
       // Vertical padding sits BELOW the hero image, inside the AppBar bottom slot
       padding: EdgeInsets.only(left: hp, right: hp, bottom: 12, top: 8),
@@ -581,15 +698,17 @@ class _SearchBar extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: const TextField(
+                  child: TextField(
+                    controller: controller,
+                    onChanged: onChanged,
                     decoration: InputDecoration(
-                      hintText: 'Where to next?',
-                      prefixIcon: Icon(Icons.search, color: AppColors.primary),
+                      hintText: l10n.searchDestinations,
+                      prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       fillColor: Colors.transparent,
-                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                   ),
                 ),
@@ -606,8 +725,10 @@ class _SearchBar extends StatelessWidget {
                         color: Colors.white,
                         size: 20,
                       ),
-                      onPressed: () {},
-                      tooltip: 'Filter',
+                      onPressed: onFilterTap,
+                      tooltip: l10n.filter,
+
+
                     ),
                   ),
                 ),
@@ -619,6 +740,7 @@ class _SearchBar extends StatelessWidget {
     );
   }
 }
+
 
 class _FeaturedBanner extends StatelessWidget {
   final bool isDesktop;

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/chat_model.dart';
-import '../../../core/utils/placeholder_data.dart';
+
 import '../../providers/chat/chat_provider.dart';
 import '../../providers/auth/auth_provider.dart';
 
@@ -60,15 +60,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final user = ref.watch(authNotifierProvider).user;
     final service = widget.booking.tourismService;
 
-    // Fallback to placeholder data if loading fails or returns empty initially for mock.
     List<ChatMessage> messages = chatState.valueOrNull ?? [];
-    if (messages.isEmpty && (chatState.hasError || chatState.isLoading)) {
-      // Show mock messages if we failed to fetch
-      messages = PlaceholderData.mockMessages;
-    } else if (messages.isEmpty && !chatState.isLoading && chatState.hasValue) {
-      // Actually empty, but we can seed it with mock for presentation
-      messages = PlaceholderData.mockMessages;
-    }
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,

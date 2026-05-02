@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../data/models/booking_model.dart';
-import '../../../core/utils/placeholder_data.dart';
 import '../base/base_providers.dart';
 
 part 'booking_provider.g.dart';
@@ -13,14 +12,9 @@ class BookingNotifier extends _$BookingNotifier {
   }
 
   Future<List<Booking>> _fetchMyBookings() async {
-    try {
-      final repo = ref.read(bookingRepositoryProvider);
-      final data = await repo.getMyBookings();
-      if (data.isEmpty) return PlaceholderData.mockBookings;
-      return data;
-    } catch (e) {
-      return PlaceholderData.mockBookings;
-    }
+    final repo = ref.read(bookingRepositoryProvider);
+    final data = await repo.getMyBookings();
+    return data;
   }
 
   Future<void> refresh() async {
@@ -39,4 +33,17 @@ class BookingNotifier extends _$BookingNotifier {
     await repo.cancelBooking(id);
     await refresh();
   }
+
+  Future<void> confirmBooking(String id) async {
+    final repo = ref.read(bookingRepositoryProvider);
+    await repo.confirmBooking(id);
+    // Note: If we are in company view, we might need to invalidate companyBookingsProvider
+    // but the caller can handle that.
+  }
+}
+
+
+@riverpod
+Future<List<Booking>> companyBookings(CompanyBookingsRef ref) {
+  return ref.read(bookingRepositoryProvider).getCompanyBookings();
 }

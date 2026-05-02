@@ -6,7 +6,24 @@ part of 'company_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$companyNotifierHash() => r'75d265a671fd061b15b1b2b6d2ea2cbe1a543e76';
+String _$myCompanyHash() => r'58adffeafaaa12e877a61b46a467f65ccc5ccf8e';
+
+/// See also [myCompany].
+@ProviderFor(myCompany)
+final myCompanyProvider = AutoDisposeFutureProvider<Company?>.internal(
+  myCompany,
+  name: r'myCompanyProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$myCompanyHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef MyCompanyRef = AutoDisposeFutureProviderRef<Company?>;
+String _$companyNotifierHash() => r'faee54964e7bd2e30b2b116df42e4b53e5b9f714';
 
 /// See also [CompanyNotifier].
 @ProviderFor(CompanyNotifier)

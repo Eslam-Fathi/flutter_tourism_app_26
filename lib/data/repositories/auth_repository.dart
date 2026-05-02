@@ -42,6 +42,16 @@ class AuthRepository {
     }
   }
 
+  Future<AuthResponse> registerAccountOnly(RegisterRequest request) async {
+    try {
+      final response = await _dio.post('/api/auth/register', data: request.toJson());
+      // Do not save the token, just return the response
+      return AuthResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   Future<User?> getMe() async {
     try {
       final response = await _dio.get('/api/auth/me');

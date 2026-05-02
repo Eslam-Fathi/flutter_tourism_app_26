@@ -21,6 +21,7 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ChatMessage {
+  @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   String get booking => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
@@ -45,7 +46,7 @@ abstract class $ChatMessageCopyWith<$Res> {
   ) = _$ChatMessageCopyWithImpl<$Res, ChatMessage>;
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     String booking,
     String content,
     User sender,
@@ -124,7 +125,7 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     String booking,
     String content,
     User sender,
@@ -186,7 +187,7 @@ class __$$ChatMessageImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ChatMessageImpl implements _ChatMessage {
   const _$ChatMessageImpl({
-    required this.id,
+    @JsonKey(name: '_id') required this.id,
     required this.booking,
     required this.content,
     required this.sender,
@@ -197,6 +198,7 @@ class _$ChatMessageImpl implements _ChatMessage {
       _$$ChatMessageImplFromJson(json);
 
   @override
+  @JsonKey(name: '_id')
   final String id;
   @override
   final String booking;
@@ -246,7 +248,7 @@ class _$ChatMessageImpl implements _ChatMessage {
 
 abstract class _ChatMessage implements ChatMessage {
   const factory _ChatMessage({
-    required final String id,
+    @JsonKey(name: '_id') required final String id,
     required final String booking,
     required final String content,
     required final User sender,
@@ -257,6 +259,7 @@ abstract class _ChatMessage implements ChatMessage {
       _$ChatMessageImpl.fromJson;
 
   @override
+  @JsonKey(name: '_id')
   String get id;
   @override
   String get booking;

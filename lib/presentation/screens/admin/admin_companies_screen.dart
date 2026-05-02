@@ -2,99 +2,121 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/responsive.dart';
 
 import '../../providers/company/company_provider.dart';
 import 'widgets/create_company_dialog.dart';
 
-class AdminCompaniesScreen extends ConsumerWidget {
+class AdminCompaniesScreen extends ConsumerStatefulWidget {
   const AdminCompaniesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminCompaniesScreen> createState() => _AdminCompaniesScreenState();
+}
+
+class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final companiesState = ref.watch(companyNotifierProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => const CreateCompanyDialog(),
-          );
-        },
-        backgroundColor: Colors.redAccent,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Add Company',
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          'Company Management',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.redAccent,
+          labelColor: Colors.redAccent,
+          unselectedLabelColor: Colors.white54,
+          tabs: const [
+            Tab(text: 'Pending Requests'),
+            Tab(text: 'All Companies'),
+          ],
+        ),
       ),
-      body: AuroraBackground(
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                backgroundColor: Colors.transparent,
-                title: const Text(
-                  'Company Management',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                centerTitle: false,
-                floating: true,
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: companiesState.when(
-                  data: (companies) {
-                    if (companies.isEmpty) {
-                      return SliverToBoxAdapter(
-                        child: Center(
-                          child: Text(
-                            'No companies available.',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      );
-                    }
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final company = companies[index];
-                        return _CompanyAdminTile(
-                          companyId: company.id,
-                          name: company.name,
-                          category: company.category,
-                          isApproved: company.approved,
-                        );
-                      }, childCount: companies.length),
-                    );
-                  },
-                  loading: () => const SliverToBoxAdapter(
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  error: (error, stack) => SliverToBoxAdapter(
-                    child: Center(
-                      child: Text(
-                        'Error loading companies: \$error',
-                        style: const TextStyle(color: AppColors.error),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 80),
-              ), // FAB padding
-            ],
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: Responsive.isDesktop(context) ? 0 : 90),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => const CreateCompanyDialog(),
+            );
+          },
+          backgroundColor: Colors.redAccent,
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text(
+            'Add Company',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ),
+      body: AuroraBackground(
+        child: companiesState.when(
+          data: (companies) {
+            final pending = companies.where((c) => !c.approved).toList();
+            
+            return TabBarView(
+              controller: _tabController,
+              children: [
+                _buildCompanyList(pending, 'No pending requests found.'),
+                _buildCompanyList(companies, 'No companies available.'),
+              ],
+            );
+          },
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          ),
+          error: (error, stack) => Center(
+            child: Text(
+              'Error: $error',
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompanyList(List<dynamic> companies, String emptyMessage) {
+    if (companies.isEmpty) {
+      return Center(
+        child: Text(
+          emptyMessage,
+          style: const TextStyle(color: Colors.white70),
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: companies.length,
+      itemBuilder: (context, index) {
+        final company = companies[index];
+        return _CompanyAdminTile(
+          companyId: company.id,
+          name: company.name,
+          category: company.category,
+          isApproved: company.approved,
+        );
+      },
     );
   }
 }

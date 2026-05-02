@@ -23,7 +23,7 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) {
 mixin _$AuthResponse {
   bool get success => throw _privateConstructorUsedError;
   String get token => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user')
+  @JsonKey(name: 'data')
   User? get user => throw _privateConstructorUsedError;
 
   /// Serializes this AuthResponse to a JSON map.
@@ -43,7 +43,7 @@ abstract class $AuthResponseCopyWith<$Res> {
     $Res Function(AuthResponse) then,
   ) = _$AuthResponseCopyWithImpl<$Res, AuthResponse>;
   @useResult
-  $Res call({bool success, String token, @JsonKey(name: 'user') User? user});
+  $Res call({bool success, String token, @JsonKey(name: 'data') User? user});
 
   $UserCopyWith<$Res>? get user;
 }
@@ -110,7 +110,7 @@ abstract class _$$AuthResponseImplCopyWith<$Res>
   ) = __$$AuthResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool success, String token, @JsonKey(name: 'user') User? user});
+  $Res call({bool success, String token, @JsonKey(name: 'data') User? user});
 
   @override
   $UserCopyWith<$Res>? get user;
@@ -159,7 +159,7 @@ class _$AuthResponseImpl implements _AuthResponse {
   const _$AuthResponseImpl({
     required this.success,
     required this.token,
-    @JsonKey(name: 'user') this.user,
+    @JsonKey(name: 'data') this.user,
   });
 
   factory _$AuthResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -170,7 +170,7 @@ class _$AuthResponseImpl implements _AuthResponse {
   @override
   final String token;
   @override
-  @JsonKey(name: 'user')
+  @JsonKey(name: 'data')
   final User? user;
 
   @override
@@ -210,7 +210,7 @@ abstract class _AuthResponse implements AuthResponse {
   const factory _AuthResponse({
     required final bool success,
     required final String token,
-    @JsonKey(name: 'user') final User? user,
+    @JsonKey(name: 'data') final User? user,
   }) = _$AuthResponseImpl;
 
   factory _AuthResponse.fromJson(Map<String, dynamic> json) =
@@ -221,7 +221,7 @@ abstract class _AuthResponse implements AuthResponse {
   @override
   String get token;
   @override
-  @JsonKey(name: 'user')
+  @JsonKey(name: 'data')
   User? get user;
 
   /// Create a copy of AuthResponse
@@ -537,7 +537,7 @@ class _$RegisterRequestImpl implements _RegisterRequest {
     required this.name,
     required this.email,
     required this.password,
-    this.role = 'User',
+    this.role = 'user',
   });
 
   factory _$RegisterRequestImpl.fromJson(Map<String, dynamic> json) =>

@@ -26,7 +26,9 @@ mixin _$TourismService {
   String get title => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   String get location => throw _privateConstructorUsedError;
-  String get category => throw _privateConstructorUsedError;
+  String get category =>
+      throw _privateConstructorUsedError; // company can be a plain String ID or a populated Company object from the backend
+  @JsonKey(fromJson: _parseId)
   String get company => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   List<String> get images => throw _privateConstructorUsedError;
@@ -56,7 +58,7 @@ abstract class $TourismServiceCopyWith<$Res> {
     double price,
     String location,
     String category,
-    String company,
+    @JsonKey(fromJson: _parseId) String company,
     String? description,
     List<String> images,
     double rating,
@@ -153,7 +155,7 @@ abstract class _$$TourismServiceImplCopyWith<$Res>
     double price,
     String location,
     String category,
-    String company,
+    @JsonKey(fromJson: _parseId) String company,
     String? description,
     List<String> images,
     double rating,
@@ -239,10 +241,10 @@ class _$TourismServiceImpl implements _TourismService {
   const _$TourismServiceImpl({
     @JsonKey(name: '_id') required this.id,
     required this.title,
-    required this.price,
+    this.price = 0.0,
     required this.location,
     required this.category,
-    required this.company,
+    @JsonKey(fromJson: _parseId) required this.company,
     this.description,
     final List<String> images = const [],
     this.rating = 0.0,
@@ -258,12 +260,15 @@ class _$TourismServiceImpl implements _TourismService {
   @override
   final String title;
   @override
+  @JsonKey()
   final double price;
   @override
   final String location;
   @override
   final String category;
+  // company can be a plain String ID or a populated Company object from the backend
   @override
+  @JsonKey(fromJson: _parseId)
   final String company;
   @override
   final String? description;
@@ -346,10 +351,10 @@ abstract class _TourismService implements TourismService {
   const factory _TourismService({
     @JsonKey(name: '_id') required final String id,
     required final String title,
-    required final double price,
+    final double price,
     required final String location,
     required final String category,
-    required final String company,
+    @JsonKey(fromJson: _parseId) required final String company,
     final String? description,
     final List<String> images,
     final double rating,
@@ -369,8 +374,9 @@ abstract class _TourismService implements TourismService {
   @override
   String get location;
   @override
-  String get category;
+  String get category; // company can be a plain String ID or a populated Company object from the backend
   @override
+  @JsonKey(fromJson: _parseId)
   String get company;
   @override
   String? get description;

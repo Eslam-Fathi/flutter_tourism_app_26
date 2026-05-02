@@ -4,7 +4,7 @@ import '../../data/models/article_model.dart';
 import '../../../core/theme/app_colors.dart';
 
 class ArticleCard extends StatelessWidget {
-  final HistoricArticle article;
+  final HistoricalArticle article;
   final VoidCallback onTap;
 
   const ArticleCard({

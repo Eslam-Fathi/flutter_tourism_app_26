@@ -10,10 +10,10 @@ _$TourismServiceImpl _$$TourismServiceImplFromJson(Map<String, dynamic> json) =>
     _$TourismServiceImpl(
       id: json['_id'] as String,
       title: json['title'] as String,
-      price: (json['price'] as num).toDouble(),
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
       location: json['location'] as String,
       category: json['category'] as String,
-      company: json['company'] as String,
+      company: _parseId(json['company']),
       description: json['description'] as String?,
       images:
           (json['images'] as List<dynamic>?)

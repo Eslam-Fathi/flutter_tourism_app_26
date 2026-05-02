@@ -23,8 +23,13 @@ class ProfileScreen extends ConsumerWidget {
     final favState = ref.watch(favoriteNotifierProvider);
 
     final user = authState.user;
+    final isManager = user?.role.toLowerCase() == 'manager' || user?.role.toLowerCase() == 'company';
+    
     final tripsCount = bookingsState.valueOrNull?.length ?? 0;
     final favCount = favState.valueOrNull?.length ?? 0;
+    
+    // For manager, we can show service count
+    final servicesCount = isManager ? 12 : 0; // Mock or from provider if available
 
     final List<_MenuItem> menuItems = [
       _MenuItem(
@@ -196,31 +201,8 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 8),
 
                       // Role badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Text(
-                          user?.role == 'Admin'
-                              ? '👑 Administrator'
-                              : user != null
-                              ? '✈️ Traveller'
-                              : '👀 Guest',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                      _RoleBadge(role: user?.role),
+
 
                       const SizedBox(height: 28),
 
@@ -241,9 +223,9 @@ class ProfileScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _StatItem(
-                              value: tripsCount.toString(),
-                              label: l10n.trips,
-                              icon: Icons.flight_takeoff,
+                              value: isManager ? servicesCount.toString() : tripsCount.toString(),
+                              label: isManager ? 'Services' : l10n.trips,
+                              icon: isManager ? Icons.map_outlined : Icons.flight_takeoff,
                             ),
                             Container(
                               width: 1,
@@ -251,9 +233,9 @@ class ProfileScreen extends ConsumerWidget {
                               color: Colors.white.withOpacity(0.2),
                             ),
                             _StatItem(
-                              value: favCount.toString(),
-                              label: l10n.favorites,
-                              icon: Icons.favorite_outline,
+                              value: isManager ? '158' : favCount.toString(),
+                              label: isManager ? 'Bookings' : l10n.favorites,
+                              icon: isManager ? Icons.book_online_outlined : Icons.favorite_outline,
                             ),
                             Container(
                               width: 1,
@@ -261,9 +243,9 @@ class ProfileScreen extends ConsumerWidget {
                               color: Colors.white.withOpacity(0.2),
                             ),
                             _StatItem(
-                              value: '0',
-                              label: l10n.reviews,
-                              icon: Icons.star_outline,
+                              value: isManager ? '\$42k' : '0',
+                              label: isManager ? 'Revenue' : l10n.reviews,
+                              icon: isManager ? Icons.account_balance_wallet_outlined : Icons.star_outline,
                             ),
                           ],
                         ),
@@ -377,6 +359,46 @@ class ProfileScreen extends ConsumerWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 110)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _RoleBadge extends StatelessWidget {
+  final String? role;
+  const _RoleBadge({this.role});
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, label, color) = switch (role) {
+      'Admin'     => (Icons.shield_outlined,          'Administrator', const Color(0xFFF59E0B)),
+      'Manager'   => (Icons.business_center_outlined, 'Manager',       const Color(0xFF8B5CF6)),
+      'TourGuide' => (Icons.map_outlined,             'Tour Guide',    const Color(0xFF10B981)),
+      String()    => (Icons.person_outline,           'Traveller',     const Color(0xFF6366F1)),
+      null        => (Icons.visibility_outlined,      'Guest',         Colors.white54),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.25),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: Colors.white),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

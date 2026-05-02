@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/aurora_background.dart';
+import '../../../core/utils/app_enums.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +19,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isSignUp = false;
-  bool _isCompanyRole = false;
+  // Valid backend roles (Admin is assigned server-side, not self-registered)
+  static const List<Map<String, dynamic>> _roles = [
+    {'value': 'User',      'label': 'Traveller',  'icon': Icons.person_outline},
+    {'value': 'Manager',   'label': 'Manager',    'icon': Icons.business_center_outlined},
+    {'value': 'TourGuide', 'label': 'Tour Guide', 'icon': Icons.map_outlined},
+  ];
+  int _selectedRoleIndex = 0; // default: User/Traveller
+  final _companyNameController = TextEditingController();
+  final _companyDescriptionController = TextEditingController();
+  final _companyAddressController = TextEditingController();
+  final _companyPhoneController = TextEditingController();
+  String _companyCategory = CompanyCategory.tours.value; // default: 'Tours'
+
+
   final _nameController = TextEditingController();
 
   late final AnimationController _enterController;
@@ -47,7 +61,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    _companyNameController.dispose();
+    _companyDescriptionController.dispose();
+    _companyAddressController.dispose();
+    _companyPhoneController.dispose();
     _enterController.dispose();
+
     super.dispose();
   }
 
@@ -199,7 +218,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                           icon: Icons.person_outline,
                                         ),
                                         _divider(),
-                                        // Role selector
+                                        // ── Role selector ────────────────
                                         Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                           child: Row(
@@ -210,55 +229,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                               const Spacer(),
                                               Container(
                                                 decoration: BoxDecoration(
-                                                  color: AppColors.primary.withOpacity(0.08),
+                                                  color: AppColors.primary.withValues(alpha: 0.08),
                                                   borderRadius: BorderRadius.circular(10),
                                                 ),
                                                 child: Row(
                                                   mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () => setState(() => _isCompanyRole = false),
-                                                      child: AnimatedContainer(
-                                                        duration: const Duration(milliseconds: 200),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                                        decoration: BoxDecoration(
-                                                          color: !_isCompanyRole ? AppColors.primary : Colors.transparent,
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        ),
-                                                        child: Text('Traveller',
-                                                          style: TextStyle(
-                                                            color: !_isCompanyRole ? Colors.white : AppColors.textMuted,
-                                                            fontWeight: FontWeight.w600,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () => setState(() => _isCompanyRole = true),
-                                                      child: AnimatedContainer(
-                                                        duration: const Duration(milliseconds: 200),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                                        decoration: BoxDecoration(
-                                                          color: _isCompanyRole ? AppColors.primary : Colors.transparent,
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        ),
-                                                        child: Text('Company',
-                                                          style: TextStyle(
-                                                            color: _isCompanyRole ? Colors.white : AppColors.textMuted,
-                                                            fontWeight: FontWeight.w600,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
+                                                  children: List.generate(_roles.length, (i) {
+                                                    final role = _roles[i];
+                                                    return _roleChip(
+                                                      role['label'] as String,
+                                                      _selectedRoleIndex == i,
+                                                      () => setState(() => _selectedRoleIndex = i),
+                                                    );
+                                                  }),
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
+                                        // ── Company fields (Manager only) ──
+                                        if (_selectedRoleIndex == 1) ...[
+                                          _divider(),
+                                          _formField(
+                                            controller: _companyNameController,
+                                            hint: 'Company name',
+                                            icon: Icons.business_outlined,
+                                          ),
+                                          _divider(),
+                                          _formField(
+                                            controller: _companyDescriptionController,
+                                            hint: 'Company description',
+                                            icon: Icons.description_outlined,
+                                          ),
+                                          _divider(),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                            child: DropdownButtonFormField<String>(
+                                              value: _companyCategory,
+                                              decoration: const InputDecoration(
+                                                prefixIcon: Icon(Icons.category_outlined, color: AppColors.primary, size: 20),
+                                                hintText: 'Category',
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 14),
+                                              ),
+                                              items: CompanyCategory.values
+                                                  .map((c) => DropdownMenuItem(value: c.value, child: Text(c.label)))
+                                                  .toList(),
+                                              onChanged: (v) => setState(() => _companyCategory = v!),
+                                            ),
+                                          ),
+                                          _divider(),
+                                          _formField(
+                                            controller: _companyAddressController,
+                                            hint: 'Company Address',
+                                            icon: Icons.location_on_outlined,
+                                          ),
+                                          _divider(),
+                                          _formField(
+                                            controller: _companyPhoneController,
+                                            hint: 'Company Phone',
+                                            icon: Icons.phone_outlined,
+                                            keyboardType: TextInputType.phone,
+                                          ),
+                                        ],
                                         _divider(),
+
+
                                       ],
                                       _formField(
                                         controller: _emailController,
@@ -367,14 +403,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     ? null
                                     : () {
                                         if (_isSignUp) {
-                                          ref
-                                              .read(authNotifierProvider.notifier)
-                                              .register(
-                                                _nameController.text.trim(),
-                                                _emailController.text.trim(),
-                                                _passwordController.text,
-                                                role: _isCompanyRole ? 'Company' : 'User',
-                                              );
+                                          final roleValue = _roles[_selectedRoleIndex]['value'] as String;
+                                          if (_selectedRoleIndex == 1) {
+                                            // Manager: register + create company
+                                            ref.read(authNotifierProvider.notifier).registerAsCompany(
+                                              _nameController.text.trim(),
+                                              _emailController.text.trim(),
+                                              _passwordController.text,
+                                              _companyNameController.text.trim(),
+                                              _companyDescriptionController.text.trim(),
+                                              _companyCategory,
+                                              _companyAddressController.text.trim(),
+                                              _companyPhoneController.text.trim(),
+                                            );
+                                          } else {
+                                            // User or TourGuide: plain register
+                                            ref.read(authNotifierProvider.notifier).register(
+                                              _nameController.text.trim(),
+                                              _emailController.text.trim(),
+                                              _passwordController.text,
+                                              role: roleValue,
+                                            );
+                                          }
                                         } else {
                                           ref
                                               .read(authNotifierProvider.notifier)
@@ -447,6 +497,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _roleChip(String label, bool isActive, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isActive ? Colors.white : AppColors.textMuted,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
           ),
         ),
       ),

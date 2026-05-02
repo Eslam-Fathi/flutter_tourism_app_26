@@ -9,7 +9,7 @@ class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
     required bool success,
     required String token,
-    @JsonKey(name: 'user') User? user,
+    @JsonKey(name: 'data') User? user,
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
@@ -31,7 +31,7 @@ class RegisterRequest with _$RegisterRequest {
     required String name,
     required String email,
     required String password,
-    @Default('User') String role,
+    @Default('user') String role,
   }) = _RegisterRequest;
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) => _$RegisterRequestFromJson(json);

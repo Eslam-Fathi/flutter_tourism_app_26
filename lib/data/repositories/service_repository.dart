@@ -16,7 +16,9 @@ class ServiceRepository {
           'search': search,
         },
       );
-      return ServiceResponse.fromJson(response.data);
+      final responseData = response.data;
+      if (responseData == null) throw 'No response from server';
+      return ServiceResponse.fromJson(responseData);
     } on DioException catch (e) {
       throw _handleError(e);
     }
@@ -34,7 +36,9 @@ class ServiceRepository {
   Future<TourismService> createService(Map<String, dynamic> serviceData) async {
     try {
       final response = await _dio.post('/api/services', data: serviceData);
-      return TourismService.fromJson(response.data['data']);
+      final data = response.data['data'];
+      if (data == null) throw 'Failed to parse service data from response';
+      return TourismService.fromJson(data);
     } on DioException catch (e) {
       throw _handleError(e);
     }

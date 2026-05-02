@@ -47,3 +47,9 @@ app.*.map.json
 # AI agent / skills folders
 .agents/
 .agent/
+# Environment variables
+.env
+
+# API Documentation & Collections
+lib/core/utils/api_doc.txt
+lib/core/utils/postman_collection.txt

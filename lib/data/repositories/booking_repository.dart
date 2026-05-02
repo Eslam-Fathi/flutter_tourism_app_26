@@ -9,7 +9,9 @@ class BookingRepository {
   Future<List<Booking>> getMyBookings() async {
     try {
       final response = await _dio.get('/api/bookings/my-bookings');
-      return (response.data['data'] as List).map((e) => Booking.fromJson(e)).toList();
+      final list = response.data['data'];
+      if (list == null || list is! List) return [];
+      return list.map((e) => Booking.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
       throw _handleError(e);
     }

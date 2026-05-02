@@ -191,13 +191,17 @@ Booking _$BookingFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Booking {
   @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'service')
+  String get id => throw _privateConstructorUsedError; // The backend might return service as a populated object OR a string ID.
+  // We parse it into a TourismService object if possible, otherwise we
+  // handle it resiliently.
+  @JsonKey(name: 'service', fromJson: _parseService)
   TourismService get tourismService => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseId)
   String get user => throw _privateConstructorUsedError;
   BookingDates get dates => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   double get totalPrice => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Booking to a JSON map.
@@ -216,11 +220,13 @@ abstract class $BookingCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    @JsonKey(name: 'service') TourismService tourismService,
-    String user,
+    @JsonKey(name: 'service', fromJson: _parseService)
+    TourismService tourismService,
+    @JsonKey(fromJson: _parseId) String user,
     BookingDates dates,
     String status,
     double totalPrice,
+    String? notes,
     DateTime createdAt,
   });
 
@@ -249,6 +255,7 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
     Object? dates = null,
     Object? status = null,
     Object? totalPrice = null,
+    Object? notes = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -277,6 +284,10 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
                 ? _value.totalPrice
                 : totalPrice // ignore: cast_nullable_to_non_nullable
                       as double,
+            notes: freezed == notes
+                ? _value.notes
+                : notes // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -317,11 +328,13 @@ abstract class _$$BookingImplCopyWith<$Res> implements $BookingCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    @JsonKey(name: 'service') TourismService tourismService,
-    String user,
+    @JsonKey(name: 'service', fromJson: _parseService)
+    TourismService tourismService,
+    @JsonKey(fromJson: _parseId) String user,
     BookingDates dates,
     String status,
     double totalPrice,
+    String? notes,
     DateTime createdAt,
   });
 
@@ -351,6 +364,7 @@ class __$$BookingImplCopyWithImpl<$Res>
     Object? dates = null,
     Object? status = null,
     Object? totalPrice = null,
+    Object? notes = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -379,6 +393,10 @@ class __$$BookingImplCopyWithImpl<$Res>
             ? _value.totalPrice
             : totalPrice // ignore: cast_nullable_to_non_nullable
                   as double,
+        notes: freezed == notes
+            ? _value.notes
+            : notes // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -393,11 +411,13 @@ class __$$BookingImplCopyWithImpl<$Res>
 class _$BookingImpl implements _Booking {
   const _$BookingImpl({
     @JsonKey(name: '_id') required this.id,
-    @JsonKey(name: 'service') required this.tourismService,
-    required this.user,
+    @JsonKey(name: 'service', fromJson: _parseService)
+    required this.tourismService,
+    @JsonKey(fromJson: _parseId) required this.user,
     required this.dates,
-    required this.status,
-    required this.totalPrice,
+    this.status = 'pending',
+    this.totalPrice = 0.0,
+    this.notes,
     required this.createdAt,
   });
 
@@ -407,23 +427,31 @@ class _$BookingImpl implements _Booking {
   @override
   @JsonKey(name: '_id')
   final String id;
+  // The backend might return service as a populated object OR a string ID.
+  // We parse it into a TourismService object if possible, otherwise we
+  // handle it resiliently.
   @override
-  @JsonKey(name: 'service')
+  @JsonKey(name: 'service', fromJson: _parseService)
   final TourismService tourismService;
   @override
+  @JsonKey(fromJson: _parseId)
   final String user;
   @override
   final BookingDates dates;
   @override
+  @JsonKey()
   final String status;
   @override
+  @JsonKey()
   final double totalPrice;
+  @override
+  final String? notes;
   @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'Booking(id: $id, tourismService: $tourismService, user: $user, dates: $dates, status: $status, totalPrice: $totalPrice, createdAt: $createdAt)';
+    return 'Booking(id: $id, tourismService: $tourismService, user: $user, dates: $dates, status: $status, totalPrice: $totalPrice, notes: $notes, createdAt: $createdAt)';
   }
 
   @override
@@ -439,6 +467,7 @@ class _$BookingImpl implements _Booking {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.totalPrice, totalPrice) ||
                 other.totalPrice == totalPrice) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -453,6 +482,7 @@ class _$BookingImpl implements _Booking {
     dates,
     status,
     totalPrice,
+    notes,
     createdAt,
   );
 
@@ -473,11 +503,13 @@ class _$BookingImpl implements _Booking {
 abstract class _Booking implements Booking {
   const factory _Booking({
     @JsonKey(name: '_id') required final String id,
-    @JsonKey(name: 'service') required final TourismService tourismService,
-    required final String user,
+    @JsonKey(name: 'service', fromJson: _parseService)
+    required final TourismService tourismService,
+    @JsonKey(fromJson: _parseId) required final String user,
     required final BookingDates dates,
-    required final String status,
-    required final double totalPrice,
+    final String status,
+    final double totalPrice,
+    final String? notes,
     required final DateTime createdAt,
   }) = _$BookingImpl;
 
@@ -485,11 +517,14 @@ abstract class _Booking implements Booking {
 
   @override
   @JsonKey(name: '_id')
-  String get id;
+  String get id; // The backend might return service as a populated object OR a string ID.
+  // We parse it into a TourismService object if possible, otherwise we
+  // handle it resiliently.
   @override
-  @JsonKey(name: 'service')
+  @JsonKey(name: 'service', fromJson: _parseService)
   TourismService get tourismService;
   @override
+  @JsonKey(fromJson: _parseId)
   String get user;
   @override
   BookingDates get dates;
@@ -497,6 +532,8 @@ abstract class _Booking implements Booking {
   String get status;
   @override
   double get totalPrice;
+  @override
+  String? get notes;
   @override
   DateTime get createdAt;
 
@@ -516,6 +553,7 @@ CreateBookingRequest _$CreateBookingRequestFromJson(Map<String, dynamic> json) {
 mixin _$CreateBookingRequest {
   String get service => throw _privateConstructorUsedError;
   BookingDates get dates => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
 
   /// Serializes this CreateBookingRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -534,7 +572,7 @@ abstract class $CreateBookingRequestCopyWith<$Res> {
     $Res Function(CreateBookingRequest) then,
   ) = _$CreateBookingRequestCopyWithImpl<$Res, CreateBookingRequest>;
   @useResult
-  $Res call({String service, BookingDates dates});
+  $Res call({String service, BookingDates dates, String? notes});
 
   $BookingDatesCopyWith<$Res> get dates;
 }
@@ -556,7 +594,11 @@ class _$CreateBookingRequestCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? service = null, Object? dates = null}) {
+  $Res call({
+    Object? service = null,
+    Object? dates = null,
+    Object? notes = freezed,
+  }) {
     return _then(
       _value.copyWith(
             service: null == service
@@ -567,6 +609,10 @@ class _$CreateBookingRequestCopyWithImpl<
                 ? _value.dates
                 : dates // ignore: cast_nullable_to_non_nullable
                       as BookingDates,
+            notes: freezed == notes
+                ? _value.notes
+                : notes // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -592,7 +638,7 @@ abstract class _$$CreateBookingRequestImplCopyWith<$Res>
   ) = __$$CreateBookingRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String service, BookingDates dates});
+  $Res call({String service, BookingDates dates, String? notes});
 
   @override
   $BookingDatesCopyWith<$Res> get dates;
@@ -611,7 +657,11 @@ class __$$CreateBookingRequestImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? service = null, Object? dates = null}) {
+  $Res call({
+    Object? service = null,
+    Object? dates = null,
+    Object? notes = freezed,
+  }) {
     return _then(
       _$CreateBookingRequestImpl(
         service: null == service
@@ -622,6 +672,10 @@ class __$$CreateBookingRequestImplCopyWithImpl<$Res>
             ? _value.dates
             : dates // ignore: cast_nullable_to_non_nullable
                   as BookingDates,
+        notes: freezed == notes
+            ? _value.notes
+            : notes // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -633,6 +687,7 @@ class _$CreateBookingRequestImpl implements _CreateBookingRequest {
   const _$CreateBookingRequestImpl({
     required this.service,
     required this.dates,
+    this.notes,
   });
 
   factory _$CreateBookingRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -642,10 +697,12 @@ class _$CreateBookingRequestImpl implements _CreateBookingRequest {
   final String service;
   @override
   final BookingDates dates;
+  @override
+  final String? notes;
 
   @override
   String toString() {
-    return 'CreateBookingRequest(service: $service, dates: $dates)';
+    return 'CreateBookingRequest(service: $service, dates: $dates, notes: $notes)';
   }
 
   @override
@@ -654,12 +711,13 @@ class _$CreateBookingRequestImpl implements _CreateBookingRequest {
         (other.runtimeType == runtimeType &&
             other is _$CreateBookingRequestImpl &&
             (identical(other.service, service) || other.service == service) &&
-            (identical(other.dates, dates) || other.dates == dates));
+            (identical(other.dates, dates) || other.dates == dates) &&
+            (identical(other.notes, notes) || other.notes == notes));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, service, dates);
+  int get hashCode => Object.hash(runtimeType, service, dates, notes);
 
   /// Create a copy of CreateBookingRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -683,6 +741,7 @@ abstract class _CreateBookingRequest implements CreateBookingRequest {
   const factory _CreateBookingRequest({
     required final String service,
     required final BookingDates dates,
+    final String? notes,
   }) = _$CreateBookingRequestImpl;
 
   factory _CreateBookingRequest.fromJson(Map<String, dynamic> json) =
@@ -692,6 +751,8 @@ abstract class _CreateBookingRequest implements CreateBookingRequest {
   String get service;
   @override
   BookingDates get dates;
+  @override
+  String? get notes;
 
   /// Create a copy of CreateBookingRequest
   /// with the given fields replaced by the non-null parameter values.

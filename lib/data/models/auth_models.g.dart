@@ -10,16 +10,16 @@ _$AuthResponseImpl _$$AuthResponseImplFromJson(Map<String, dynamic> json) =>
     _$AuthResponseImpl(
       success: json['success'] as bool,
       token: json['token'] as String,
-      user: json['user'] == null
+      user: json['data'] == null
           ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
+          : User.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$AuthResponseImplToJson(_$AuthResponseImpl instance) =>
     <String, dynamic>{
       'success': instance.success,
       'token': instance.token,
-      'user': instance.user,
+      'data': instance.user,
     };
 
 _$LoginRequestImpl _$$LoginRequestImplFromJson(Map<String, dynamic> json) =>
@@ -37,7 +37,7 @@ _$RegisterRequestImpl _$$RegisterRequestImplFromJson(
   name: json['name'] as String,
   email: json['email'] as String,
   password: json['password'] as String,
-  role: json['role'] as String? ?? 'User',
+  role: json['role'] as String? ?? 'user',
 );
 
 Map<String, dynamic> _$$RegisterRequestImplToJson(

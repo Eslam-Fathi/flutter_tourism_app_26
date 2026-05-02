@@ -9,38 +9,41 @@ import '../screens/explore/explore_screen.dart';
 import '../screens/bookings/my_bookings_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/chat/conversations_screen.dart';
+import '../../l10n/app_localizations.dart';
+
 
 // ── Nav destination model ─────────────────────────────────────────────────
 class _NavDest {
   final IconData icon;
   final IconData activeIcon;
-  final String label;
+  final String Function(AppLocalizations) label;
   const _NavDest(
       {required this.icon, required this.activeIcon, required this.label});
 }
 
-const List<_NavDest> _destinations = [
+final List<_NavDest> _destinations = [
   _NavDest(
       icon: Icons.home_outlined,
       activeIcon: Icons.home_rounded,
-      label: 'Home'),
+      label: (l) => l.home),
   _NavDest(
       icon: Icons.explore_outlined,
       activeIcon: Icons.explore,
-      label: 'Explore'),
+      label: (l) => l.explore),
   _NavDest(
       icon: Icons.luggage_outlined,
       activeIcon: Icons.luggage,
-      label: 'Bookings'),
+      label: (l) => l.bookings),
   _NavDest(
       icon: Icons.chat_bubble_outline,
       activeIcon: Icons.chat_bubble,
-      label: 'Messages'),
+      label: (l) => l.messages),
   _NavDest(
       icon: Icons.person_outline,
       activeIcon: Icons.person_rounded,
-      label: 'Profile'),
+      label: (l) => l.profile),
 ];
+
 
 // ── Main Wrapper ──────────────────────────────────────────────────────────
 class MainWrapper extends ConsumerStatefulWidget {
@@ -198,7 +201,7 @@ class _DesktopNavRail extends ConsumerWidget {
                           ),
                           const SizedBox(width: 14),
                           Text(
-                            dest.label,
+                            dest.label(AppLocalizations.of(context)!),
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
@@ -209,6 +212,7 @@ class _DesktopNavRail extends ConsumerWidget {
                               fontSize: 15,
                             ),
                           ),
+
                         ],
                       ),
                     ),
@@ -289,70 +293,95 @@ class _BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomPad = MediaQuery.of(context).padding.bottom;
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: EdgeInsets.only(
-              top: 10, left: 16, right: 16, bottom: 10 + bottomPad),
-          decoration: const BoxDecoration(
-            color: Color(0xF2FFFFFF),
-            border: Border(top: BorderSide(color: Color(0x1A000000))),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(_destinations.length, (index) {
-              final dest = _destinations[index];
-              final isSelected = index == currentIndex;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () => onTap(index),
-                  behavior: HitTestBehavior.translucent,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 220),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.12)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(
-                          isSelected ? dest.activeIcon : dest.icon,
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 220),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textMuted,
-                        ),
-                        child: Text(dest.label),
-                      ),
-                    ],
-                  ),
+    
+    return Container(
+      margin: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        bottom: bottomPad > 0 ? bottomPad : 20,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundDark.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
-              );
-            }),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(_destinations.length, (index) {
+                final dest = _destinations[index];
+                final isSelected = index == currentIndex;
+                
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => onTap(index),
+                    behavior: HitTestBehavior.translucent,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isSelected ? dest.activeIcon : dest.icon,
+                            color: isSelected
+                                ? AppColors.secondary
+                                : Colors.white.withValues(alpha: 0.5),
+                            size: 24,
+                          ),
+                          const SizedBox(height: 4),
+                          AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 300),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.5),
+                            ),
+                            child: Text(dest.label(l10n)),
+                          ),
+                          const SizedBox(height: 2),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: isSelected ? 4 : 0,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
           ),
         ),
       ),
     );
   }
 }
+
 

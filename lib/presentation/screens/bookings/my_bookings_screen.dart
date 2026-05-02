@@ -172,7 +172,13 @@ class _BookingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final filtered = bookings
-        .where((b) => b.status.toLowerCase() == status)
+        .where((b) {
+          final bStatus = b.status.toLowerCase();
+          if (status == 'confirmed') {
+            return bStatus == 'confirmed' || bStatus == 'pending';
+          }
+          return bStatus == status;
+        })
         .toList();
 
     if (filtered.isEmpty) {
@@ -282,8 +288,14 @@ class _BookingCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset('assets/images/bali.png',
-                      fit: BoxFit.cover),
+                  if (booking.tourismService.images.isNotEmpty)
+                    Image.network(
+                      booking.tourismService.images.first,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, _, __) => Container(color: AppColors.primary.withOpacity(0.2)),
+                    )
+                  else
+                    Container(color: AppColors.primary.withOpacity(0.2)),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -352,7 +364,35 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                if (booking.notes != null && booking.notes!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.note_outlined,
+                            size: 14, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            booking.notes!,
+                            style: const TextStyle(
+                              color: AppColors.textBody,
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

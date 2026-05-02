@@ -10,8 +10,15 @@ import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/onboarding_screen.dart';
 import 'presentation/screens/main_wrapper.dart';
 import 'presentation/screens/admin/admin_main_wrapper.dart';
+import 'presentation/screens/company/company_main_wrapper.dart';
 
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/network/supabase_config.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await SupabaseConfig.init();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -49,6 +56,8 @@ class MyApp extends ConsumerWidget {
       case AuthStatus.authenticated:
         if (state.user?.role.toLowerCase() == 'admin') {
           return const AdminMainWrapper();
+        } else if (state.user?.role.toLowerCase() == 'company' || state.user?.role.toLowerCase() == 'manager') {
+          return const CompanyMainWrapper();
         }
         return const MainWrapper();
       case AuthStatus.guest:

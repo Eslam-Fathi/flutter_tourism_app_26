@@ -9,6 +9,13 @@
   "messages": "Messages",
   "profile": "Profile",
   "home": "Home",
+  "overview": "Overview",
+  "users": "Users",
+  "companies": "Companies",
+  "historical": "Historical",
+  "admin": "Admin",
+  "tripPlans": "Trip Plans",
+
   "searchDestinations": "Search destinations…",
   "browseByCategory": "Browse by Category",
   "popularThisWeek": "Popular This Week",
@@ -56,5 +63,8 @@
   "categoryBeach": "Beach",
   "categoryMountain": "Mountain",
   "categoryCulture": "Culture",
-  "categoryCity": "City"
+  "categoryCity": "City",
+  "categoryAdventure": "Adventure",
+  "categoryFood": "Food"
+
 }

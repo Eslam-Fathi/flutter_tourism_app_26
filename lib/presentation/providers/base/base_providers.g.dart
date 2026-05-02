@@ -6,6 +6,40 @@ part of 'base_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$supabaseClientHash() => r'46d25ae919f14f51a139239cb2d1a290076e1d52';
+
+/// See also [supabaseClient].
+@ProviderFor(supabaseClient)
+final supabaseClientProvider = Provider<sb.SupabaseClient>.internal(
+  supabaseClient,
+  name: r'supabaseClientProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$supabaseClientHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef SupabaseClientRef = ProviderRef<sb.SupabaseClient>;
+String _$articleRepositoryHash() => r'2504280a2c2a63564e05e9462be85d478134a4c2';
+
+/// See also [articleRepository].
+@ProviderFor(articleRepository)
+final articleRepositoryProvider = Provider<ArticleRepository>.internal(
+  articleRepository,
+  name: r'articleRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$articleRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ArticleRepositoryRef = ProviderRef<ArticleRepository>;
 String _$tokenStorageHash() => r'b3d723f59330a588dd2342b796bbe211bf67391e';
 
 /// See also [tokenStorage].

@@ -21,12 +21,17 @@ Company _$CompanyFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Company {
+  @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
   bool get approved => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
+  String? get address => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
   String? get logo => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseOwner)
+  String? get owner => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Company to a JSON map.
@@ -44,12 +49,15 @@ abstract class $CompanyCopyWith<$Res> {
       _$CompanyCopyWithImpl<$Res, Company>;
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     String name,
     String category,
     bool approved,
     String? description,
+    String? address,
+    String? phone,
     String? logo,
+    @JsonKey(fromJson: _parseOwner) String? owner,
     DateTime? createdAt,
   });
 }
@@ -74,7 +82,10 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
     Object? category = null,
     Object? approved = null,
     Object? description = freezed,
+    Object? address = freezed,
+    Object? phone = freezed,
     Object? logo = freezed,
+    Object? owner = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -99,9 +110,21 @@ class _$CompanyCopyWithImpl<$Res, $Val extends Company>
                 ? _value.description
                 : description // ignore: cast_nullable_to_non_nullable
                       as String?,
+            address: freezed == address
+                ? _value.address
+                : address // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            phone: freezed == phone
+                ? _value.phone
+                : phone // ignore: cast_nullable_to_non_nullable
+                      as String?,
             logo: freezed == logo
                 ? _value.logo
                 : logo // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            owner: freezed == owner
+                ? _value.owner
+                : owner // ignore: cast_nullable_to_non_nullable
                       as String?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
@@ -122,12 +145,15 @@ abstract class _$$CompanyImplCopyWith<$Res> implements $CompanyCopyWith<$Res> {
   @override
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     String name,
     String category,
     bool approved,
     String? description,
+    String? address,
+    String? phone,
     String? logo,
+    @JsonKey(fromJson: _parseOwner) String? owner,
     DateTime? createdAt,
   });
 }
@@ -151,7 +177,10 @@ class __$$CompanyImplCopyWithImpl<$Res>
     Object? category = null,
     Object? approved = null,
     Object? description = freezed,
+    Object? address = freezed,
+    Object? phone = freezed,
     Object? logo = freezed,
+    Object? owner = freezed,
     Object? createdAt = freezed,
   }) {
     return _then(
@@ -176,9 +205,21 @@ class __$$CompanyImplCopyWithImpl<$Res>
             ? _value.description
             : description // ignore: cast_nullable_to_non_nullable
                   as String?,
+        address: freezed == address
+            ? _value.address
+            : address // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        phone: freezed == phone
+            ? _value.phone
+            : phone // ignore: cast_nullable_to_non_nullable
+                  as String?,
         logo: freezed == logo
             ? _value.logo
             : logo // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        owner: freezed == owner
+            ? _value.owner
+            : owner // ignore: cast_nullable_to_non_nullable
                   as String?,
         createdAt: freezed == createdAt
             ? _value.createdAt
@@ -193,12 +234,15 @@ class __$$CompanyImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CompanyImpl implements _Company {
   const _$CompanyImpl({
-    required this.id,
+    @JsonKey(name: '_id') required this.id,
     required this.name,
     required this.category,
     this.approved = false,
     this.description,
+    this.address,
+    this.phone,
     this.logo,
+    @JsonKey(fromJson: _parseOwner) this.owner,
     this.createdAt,
   });
 
@@ -206,6 +250,7 @@ class _$CompanyImpl implements _Company {
       _$$CompanyImplFromJson(json);
 
   @override
+  @JsonKey(name: '_id')
   final String id;
   @override
   final String name;
@@ -217,13 +262,20 @@ class _$CompanyImpl implements _Company {
   @override
   final String? description;
   @override
+  final String? address;
+  @override
+  final String? phone;
+  @override
   final String? logo;
+  @override
+  @JsonKey(fromJson: _parseOwner)
+  final String? owner;
   @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Company(id: $id, name: $name, category: $category, approved: $approved, description: $description, logo: $logo, createdAt: $createdAt)';
+    return 'Company(id: $id, name: $name, category: $category, approved: $approved, description: $description, address: $address, phone: $phone, logo: $logo, owner: $owner, createdAt: $createdAt)';
   }
 
   @override
@@ -239,7 +291,10 @@ class _$CompanyImpl implements _Company {
                 other.approved == approved) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.logo, logo) || other.logo == logo) &&
+            (identical(other.owner, owner) || other.owner == owner) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -253,7 +308,10 @@ class _$CompanyImpl implements _Company {
     category,
     approved,
     description,
+    address,
+    phone,
     logo,
+    owner,
     createdAt,
   );
 
@@ -273,18 +331,22 @@ class _$CompanyImpl implements _Company {
 
 abstract class _Company implements Company {
   const factory _Company({
-    required final String id,
+    @JsonKey(name: '_id') required final String id,
     required final String name,
     required final String category,
     final bool approved,
     final String? description,
+    final String? address,
+    final String? phone,
     final String? logo,
+    @JsonKey(fromJson: _parseOwner) final String? owner,
     final DateTime? createdAt,
   }) = _$CompanyImpl;
 
   factory _Company.fromJson(Map<String, dynamic> json) = _$CompanyImpl.fromJson;
 
   @override
+  @JsonKey(name: '_id')
   String get id;
   @override
   String get name;
@@ -295,7 +357,14 @@ abstract class _Company implements Company {
   @override
   String? get description;
   @override
+  String? get address;
+  @override
+  String? get phone;
+  @override
   String? get logo;
+  @override
+  @JsonKey(fromJson: _parseOwner)
+  String? get owner;
   @override
   DateTime? get createdAt;
 

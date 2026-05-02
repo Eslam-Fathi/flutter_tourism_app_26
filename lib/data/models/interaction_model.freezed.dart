@@ -21,6 +21,7 @@ Review _$ReviewFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Review {
+  @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'service')
   String get serviceId => throw _privateConstructorUsedError;
@@ -44,7 +45,7 @@ abstract class $ReviewCopyWith<$Res> {
       _$ReviewCopyWithImpl<$Res, Review>;
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     @JsonKey(name: 'service') String serviceId,
     User user,
     int rating,
@@ -128,7 +129,7 @@ abstract class _$$ReviewImplCopyWith<$Res> implements $ReviewCopyWith<$Res> {
   @override
   @useResult
   $Res call({
-    String id,
+    @JsonKey(name: '_id') String id,
     @JsonKey(name: 'service') String serviceId,
     User user,
     int rating,
@@ -196,7 +197,7 @@ class __$$ReviewImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ReviewImpl implements _Review {
   const _$ReviewImpl({
-    required this.id,
+    @JsonKey(name: '_id') required this.id,
     @JsonKey(name: 'service') required this.serviceId,
     required this.user,
     required this.rating,
@@ -208,6 +209,7 @@ class _$ReviewImpl implements _Review {
       _$$ReviewImplFromJson(json);
 
   @override
+  @JsonKey(name: '_id')
   final String id;
   @override
   @JsonKey(name: 'service')
@@ -262,7 +264,7 @@ class _$ReviewImpl implements _Review {
 
 abstract class _Review implements Review {
   const factory _Review({
-    required final String id,
+    @JsonKey(name: '_id') required final String id,
     @JsonKey(name: 'service') required final String serviceId,
     required final User user,
     required final int rating,
@@ -273,6 +275,7 @@ abstract class _Review implements Review {
   factory _Review.fromJson(Map<String, dynamic> json) = _$ReviewImpl.fromJson;
 
   @override
+  @JsonKey(name: '_id')
   String get id;
   @override
   @JsonKey(name: 'service')
@@ -300,6 +303,7 @@ Favorite _$FavoriteFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Favorite {
+  @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   TourismService get service => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -319,7 +323,11 @@ abstract class $FavoriteCopyWith<$Res> {
   factory $FavoriteCopyWith(Favorite value, $Res Function(Favorite) then) =
       _$FavoriteCopyWithImpl<$Res, Favorite>;
   @useResult
-  $Res call({String id, TourismService service, DateTime? createdAt});
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    TourismService service,
+    DateTime? createdAt,
+  });
 
   $TourismServiceCopyWith<$Res> get service;
 }
@@ -382,7 +390,11 @@ abstract class _$$FavoriteImplCopyWith<$Res>
   ) = __$$FavoriteImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, TourismService service, DateTime? createdAt});
+  $Res call({
+    @JsonKey(name: '_id') String id,
+    TourismService service,
+    DateTime? createdAt,
+  });
 
   @override
   $TourismServiceCopyWith<$Res> get service;
@@ -429,7 +441,7 @@ class __$$FavoriteImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$FavoriteImpl implements _Favorite {
   const _$FavoriteImpl({
-    required this.id,
+    @JsonKey(name: '_id') required this.id,
     required this.service,
     this.createdAt,
   });
@@ -438,6 +450,7 @@ class _$FavoriteImpl implements _Favorite {
       _$$FavoriteImplFromJson(json);
 
   @override
+  @JsonKey(name: '_id')
   final String id;
   @override
   final TourismService service;
@@ -480,7 +493,7 @@ class _$FavoriteImpl implements _Favorite {
 
 abstract class _Favorite implements Favorite {
   const factory _Favorite({
-    required final String id,
+    @JsonKey(name: '_id') required final String id,
     required final TourismService service,
     final DateTime? createdAt,
   }) = _$FavoriteImpl;
@@ -489,6 +502,7 @@ abstract class _Favorite implements Favorite {
       _$FavoriteImpl.fromJson;
 
   @override
+  @JsonKey(name: '_id')
   String get id;
   @override
   TourismService get service;

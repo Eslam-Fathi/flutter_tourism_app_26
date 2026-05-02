@@ -8,10 +8,11 @@ class TourismService with _$TourismService {
   const factory TourismService({
     @JsonKey(name: '_id') required String id,
     required String title,
-    required double price,
+    @Default(0.0) double price,
     required String location,
     required String category,
-    required String company,
+    // company can be a plain String ID or a populated Company object from the backend
+    @JsonKey(fromJson: _parseId) required String company,
     String? description,
     @Default([]) List<String> images,
     @Default(0.0) double rating,
@@ -19,6 +20,15 @@ class TourismService with _$TourismService {
   }) = _TourismService;
 
   factory TourismService.fromJson(Map<String, dynamic> json) => _$TourismServiceFromJson(json);
+}
+
+/// Safely parses a field that can be either a plain String ID or a populated
+/// Mongoose object (Map). Returns the _id string in both cases.
+String _parseId(dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value;
+  if (value is Map) return value['_id']?.toString() ?? value['id']?.toString() ?? '';
+  return value.toString();
 }
 
 @freezed

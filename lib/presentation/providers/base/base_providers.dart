@@ -8,8 +8,22 @@ import '../../../data/repositories/company_repository.dart';
 import '../../../data/repositories/interaction_repository.dart';
 import '../../../data/repositories/chat_repository.dart';
 import '../../../data/repositories/user_repository.dart';
+import '../../../core/network/supabase_config.dart';
+import '../../../data/repositories/article_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 part 'base_providers.g.dart';
+
+@Riverpod(keepAlive: true)
+sb.SupabaseClient supabaseClient(SupabaseClientRef ref) {
+  return SupabaseConfig.client;
+}
+
+@Riverpod(keepAlive: true)
+ArticleRepository articleRepository(ArticleRepositoryRef ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  return ArticleRepository(supabase: supabase);
+}
 
 @Riverpod(keepAlive: true)
 TokenStorage tokenStorage(TokenStorageRef ref) {

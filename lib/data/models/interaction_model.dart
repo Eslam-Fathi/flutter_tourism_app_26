@@ -8,7 +8,7 @@ part 'interaction_model.g.dart';
 @freezed
 class Review with _$Review {
   const factory Review({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     @JsonKey(name: 'service') required String serviceId,
     required User user,
     required int rating,
@@ -22,7 +22,7 @@ class Review with _$Review {
 @freezed
 class Favorite with _$Favorite {
   const factory Favorite({
-    required String id,
+    @JsonKey(name: '_id') required String id,
     required TourismService service,
     DateTime? createdAt,
   }) = _Favorite;

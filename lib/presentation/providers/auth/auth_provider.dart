@@ -117,6 +117,54 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
+  /// Registers a new user AND creates a company profile in one step.
+  /// Step 1: Register as a Manager role.
+  /// Step 2: Call POST /api/companies to create the company profile.
+  /// The company will be pending admin approval.
+  Future<void> registerAsCompany(
+    String name,
+    String email,
+    String password,
+    String companyName,
+    String companyDescription,
+    String companyCategory,
+    String? address,
+    String? phone,
+  ) async {
+    state = state.copyWith(isSubmitting: true, errorMessage: null);
+    try {
+      // Step 1: Register the user account with 'Manager' role
+      final response = await ref.read(authRepositoryProvider).register(
+            RegisterRequest(name: name, email: email, password: password, role: 'Manager'),
+          );
+      final user = await ref.read(authRepositoryProvider).getMe();
+
+      if (user == null && response.user == null) {
+        state = state.copyWith(isSubmitting: false, errorMessage: 'Registration failed.');
+        return;
+      }
+
+      // Step 2: Create the company profile (token is now stored from registration)
+      // NOTE: This call uses the token just obtained, so it runs as the new manager.
+      await ref.read(companyRepositoryProvider).createCompany({
+        'name': companyName,
+        'description': companyDescription,
+        'category': companyCategory,
+        if (address != null && address.isNotEmpty) 'address': address,
+        if (phone != null && phone.isNotEmpty) 'phone': phone,
+      });
+
+      // Transition to the app — company is pending admin approval
+      await _transitionToUser(user ?? response.user!, isNewUser: true);
+    } catch (e) {
+      // Surface ALL errors — company creation failures included.
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
   /// Sets the state to Guest, allowing limited access without a token.
   void continueAsGuest() {
     state = state.copyWith(status: AuthStatus.guest);
