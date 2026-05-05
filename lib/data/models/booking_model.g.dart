@@ -21,25 +21,29 @@ Map<String, dynamic> _$$BookingDatesImplToJson(_$BookingDatesImpl instance) =>
 _$BookingImpl _$$BookingImplFromJson(Map<String, dynamic> json) =>
     _$BookingImpl(
       id: json['_id'] as String,
-      tourismService: _parseService(json['service']),
-      user: _parseId(json['user']),
+      tourismService: _parseService(_readService(json, 'tourismService')),
+      user: _parseUser(_readUser(json, 'user')),
       dates: BookingDates.fromJson(json['dates'] as Map<String, dynamic>),
       status: json['status'] as String? ?? 'pending',
-      totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
+      totalPrice: _readTotalPrice(json, 'totalPrice') == null
+          ? 0.0
+          : _parsePrice(_readTotalPrice(json, 'totalPrice')),
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.parse(_readCreatedAt(json, 'createdAt') as String),
+      tourGuide: _parseUser(_readTourGuide(json, 'tourGuide')),
     );
 
 Map<String, dynamic> _$$BookingImplToJson(_$BookingImpl instance) =>
     <String, dynamic>{
       '_id': instance.id,
-      'service': instance.tourismService,
+      'tourismService': instance.tourismService,
       'user': instance.user,
       'dates': instance.dates,
       'status': instance.status,
       'totalPrice': instance.totalPrice,
       'notes': instance.notes,
       'createdAt': instance.createdAt.toIso8601String(),
+      'tourGuide': instance.tourGuide,
     };
 
 _$CreateBookingRequestImpl _$$CreateBookingRequestImplFromJson(

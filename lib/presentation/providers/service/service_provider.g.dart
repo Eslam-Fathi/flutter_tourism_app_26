@@ -165,7 +165,7 @@ final companyServicesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CompanyServicesRef = AutoDisposeFutureProviderRef<List<TourismService>>;
-String _$serviceNotifierHash() => r'62df629599b9a2cb951ba7da0674325e7e96bb48';
+String _$serviceNotifierHash() => r'6ca29e030b18d5659789cb25d6413c015498d628';
 
 /// See also [ServiceNotifier].
 @ProviderFor(ServiceNotifier)

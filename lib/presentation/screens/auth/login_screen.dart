@@ -265,7 +265,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                           Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                                             child: DropdownButtonFormField<String>(
-                                              value: _companyCategory,
+                                              initialValue: _companyCategory,
                                               decoration: const InputDecoration(
                                                 prefixIcon: Icon(Icons.category_outlined, color: AppColors.primary, size: 20),
                                                 hintText: 'Category',

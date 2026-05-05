@@ -59,13 +59,10 @@ class AppColors {
 
   // Category Colors
   static const Map<String, Color> categoryColors = {
-    'Beach': Color(0xFF06B6D4),
-    'Mountain': Color(0xFF10B981),
-    'Culture': Color(0xFF8B5CF6),
-    'Adventure': Color(0xFFF97316),
-    'City': Color(0xFF3B82F6),
-    'Food': Color(0xFFEC4899),
-    'Tours': Color(0xFF6809CE),
     'Hotel': Color(0xFF14B8A6),
+    'RealEstate': Color(0xFF06B6D4),
+    'Tours': Color(0xFF6809CE),
+    'All': Color(0xFFF97316),
+    'Cars': Color(0xFFFB923C),
   };
 }

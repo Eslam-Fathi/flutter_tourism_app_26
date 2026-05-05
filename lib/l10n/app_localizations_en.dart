@@ -48,6 +48,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchDestinations => 'Search destinations…';
 
   @override
+  String get search => 'Search';
+
+  @override
   String get browseByCategory => 'Browse by Category';
 
   @override
@@ -157,20 +160,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryAll => 'All';
 
   @override
-  String get categoryBeach => 'Beach';
+  String get categoryHotels => 'Hotels';
 
   @override
-  String get categoryMountain => 'Mountain';
+  String get categoryApartments => 'Apartments';
 
   @override
-  String get categoryCulture => 'Culture';
+  String get categoryTours => 'Tours';
 
   @override
-  String get categoryCity => 'City';
+  String get categoryCars => 'Cars';
 
   @override
-  String get categoryAdventure => 'Adventure';
+  String get aiGuide => 'Ask AI Guide';
 
   @override
-  String get categoryFood => 'Food';
+  String get askAI => 'Ask about Egypt...';
 }

@@ -24,6 +24,7 @@ mixin _$TourismService {
   @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parsePrice)
   double get price => throw _privateConstructorUsedError;
   String get location => throw _privateConstructorUsedError;
   String get category =>
@@ -31,9 +32,12 @@ mixin _$TourismService {
   @JsonKey(fromJson: _parseId)
   String get company => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseImages)
   List<String> get images => throw _privateConstructorUsedError;
   double get rating => throw _privateConstructorUsedError;
   int get reviewsCount => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  User? get tourGuide => throw _privateConstructorUsedError;
 
   /// Serializes this TourismService to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -55,15 +59,18 @@ abstract class $TourismServiceCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String id,
     String title,
-    double price,
+    @JsonKey(fromJson: _parsePrice) double price,
     String location,
     String category,
     @JsonKey(fromJson: _parseId) String company,
     String? description,
-    List<String> images,
+    @JsonKey(fromJson: _parseImages) List<String> images,
     double rating,
     int reviewsCount,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) User? tourGuide,
   });
+
+  $UserCopyWith<$Res>? get tourGuide;
 }
 
 /// @nodoc
@@ -91,6 +98,7 @@ class _$TourismServiceCopyWithImpl<$Res, $Val extends TourismService>
     Object? images = null,
     Object? rating = null,
     Object? reviewsCount = null,
+    Object? tourGuide = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -134,9 +142,27 @@ class _$TourismServiceCopyWithImpl<$Res, $Val extends TourismService>
                 ? _value.reviewsCount
                 : reviewsCount // ignore: cast_nullable_to_non_nullable
                       as int,
+            tourGuide: freezed == tourGuide
+                ? _value.tourGuide
+                : tourGuide // ignore: cast_nullable_to_non_nullable
+                      as User?,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of TourismService
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get tourGuide {
+    if (_value.tourGuide == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.tourGuide!, (value) {
+      return _then(_value.copyWith(tourGuide: value) as $Val);
+    });
   }
 }
 
@@ -152,15 +178,19 @@ abstract class _$$TourismServiceImplCopyWith<$Res>
   $Res call({
     @JsonKey(name: '_id') String id,
     String title,
-    double price,
+    @JsonKey(fromJson: _parsePrice) double price,
     String location,
     String category,
     @JsonKey(fromJson: _parseId) String company,
     String? description,
-    List<String> images,
+    @JsonKey(fromJson: _parseImages) List<String> images,
     double rating,
     int reviewsCount,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) User? tourGuide,
   });
+
+  @override
+  $UserCopyWith<$Res>? get tourGuide;
 }
 
 /// @nodoc
@@ -187,6 +217,7 @@ class __$$TourismServiceImplCopyWithImpl<$Res>
     Object? images = null,
     Object? rating = null,
     Object? reviewsCount = null,
+    Object? tourGuide = freezed,
   }) {
     return _then(
       _$TourismServiceImpl(
@@ -230,6 +261,10 @@ class __$$TourismServiceImplCopyWithImpl<$Res>
             ? _value.reviewsCount
             : reviewsCount // ignore: cast_nullable_to_non_nullable
                   as int,
+        tourGuide: freezed == tourGuide
+            ? _value.tourGuide
+            : tourGuide // ignore: cast_nullable_to_non_nullable
+                  as User?,
       ),
     );
   }
@@ -237,19 +272,21 @@ class __$$TourismServiceImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$TourismServiceImpl implements _TourismService {
+class _$TourismServiceImpl extends _TourismService {
   const _$TourismServiceImpl({
     @JsonKey(name: '_id') required this.id,
     required this.title,
-    this.price = 0.0,
+    @JsonKey(fromJson: _parsePrice) this.price = 0.0,
     required this.location,
     required this.category,
     @JsonKey(fromJson: _parseId) required this.company,
     this.description,
-    final List<String> images = const [],
+    @JsonKey(fromJson: _parseImages) final List<String> images = const [],
     this.rating = 0.0,
     this.reviewsCount = 0,
-  }) : _images = images;
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) this.tourGuide,
+  }) : _images = images,
+       super._();
 
   factory _$TourismServiceImpl.fromJson(Map<String, dynamic> json) =>
       _$$TourismServiceImplFromJson(json);
@@ -260,7 +297,7 @@ class _$TourismServiceImpl implements _TourismService {
   @override
   final String title;
   @override
-  @JsonKey()
+  @JsonKey(fromJson: _parsePrice)
   final double price;
   @override
   final String location;
@@ -274,7 +311,7 @@ class _$TourismServiceImpl implements _TourismService {
   final String? description;
   final List<String> _images;
   @override
-  @JsonKey()
+  @JsonKey(fromJson: _parseImages)
   List<String> get images {
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
@@ -287,10 +324,13 @@ class _$TourismServiceImpl implements _TourismService {
   @override
   @JsonKey()
   final int reviewsCount;
+  @override
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  final User? tourGuide;
 
   @override
   String toString() {
-    return 'TourismService(id: $id, title: $title, price: $price, location: $location, category: $category, company: $company, description: $description, images: $images, rating: $rating, reviewsCount: $reviewsCount)';
+    return 'TourismService(id: $id, title: $title, price: $price, location: $location, category: $category, company: $company, description: $description, images: $images, rating: $rating, reviewsCount: $reviewsCount, tourGuide: $tourGuide)';
   }
 
   @override
@@ -311,7 +351,9 @@ class _$TourismServiceImpl implements _TourismService {
             const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.rating, rating) || other.rating == rating) &&
             (identical(other.reviewsCount, reviewsCount) ||
-                other.reviewsCount == reviewsCount));
+                other.reviewsCount == reviewsCount) &&
+            (identical(other.tourGuide, tourGuide) ||
+                other.tourGuide == tourGuide));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -328,6 +370,7 @@ class _$TourismServiceImpl implements _TourismService {
     const DeepCollectionEquality().hash(_images),
     rating,
     reviewsCount,
+    tourGuide,
   );
 
   /// Create a copy of TourismService
@@ -347,19 +390,22 @@ class _$TourismServiceImpl implements _TourismService {
   }
 }
 
-abstract class _TourismService implements TourismService {
+abstract class _TourismService extends TourismService {
   const factory _TourismService({
     @JsonKey(name: '_id') required final String id,
     required final String title,
-    final double price,
+    @JsonKey(fromJson: _parsePrice) final double price,
     required final String location,
     required final String category,
     @JsonKey(fromJson: _parseId) required final String company,
     final String? description,
-    final List<String> images,
+    @JsonKey(fromJson: _parseImages) final List<String> images,
     final double rating,
     final int reviewsCount,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+    final User? tourGuide,
   }) = _$TourismServiceImpl;
+  const _TourismService._() : super._();
 
   factory _TourismService.fromJson(Map<String, dynamic> json) =
       _$TourismServiceImpl.fromJson;
@@ -370,6 +416,7 @@ abstract class _TourismService implements TourismService {
   @override
   String get title;
   @override
+  @JsonKey(fromJson: _parsePrice)
   double get price;
   @override
   String get location;
@@ -381,11 +428,15 @@ abstract class _TourismService implements TourismService {
   @override
   String? get description;
   @override
+  @JsonKey(fromJson: _parseImages)
   List<String> get images;
   @override
   double get rating;
   @override
   int get reviewsCount;
+  @override
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  User? get tourGuide;
 
   /// Create a copy of TourismService
   /// with the given fields replaced by the non-null parameter values.

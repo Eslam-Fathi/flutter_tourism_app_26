@@ -23,7 +23,7 @@ final myCompanyProvider = AutoDisposeFutureProvider<Company?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MyCompanyRef = AutoDisposeFutureProviderRef<Company?>;
-String _$companyNotifierHash() => r'faee54964e7bd2e30b2b116df42e4b53e5b9f714';
+String _$companyNotifierHash() => r'e7afa3e51db31d2116c4824c1714a9127a3191fa';
 
 /// See also [CompanyNotifier].
 @ProviderFor(CompanyNotifier)

@@ -6,7 +6,13 @@ class ServiceRepository {
 
   ServiceRepository({required Dio dio}) : _dio = dio;
 
-  Future<ServiceResponse> getAllServices({int page = 1, int limit = 10, String search = ''}) async {
+  Future<ServiceResponse> getAllServices({
+    int page = 1,
+    int limit = 20,
+    String search = '',
+    String? category,
+    double? maxPrice,
+  }) async {
     try {
       final response = await _dio.get(
         '/api/services',
@@ -14,6 +20,8 @@ class ServiceRepository {
           'page': page,
           'limit': limit,
           'search': search,
+          if (category != null && category != 'All') 'category': category,
+          if (maxPrice != null) 'maxPrice': maxPrice,
         },
       );
       final responseData = response.data;

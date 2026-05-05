@@ -8,8 +8,10 @@ import 'package:flutter_tourism_app_26/presentation/providers/theme/theme_provid
 import 'package:flutter_tourism_app_26/presentation/providers/booking/booking_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/interaction/interaction_provider.dart';
 import '../chat/conversations_screen.dart';
+import '../chat/ai_chat_screen.dart';
 import 'favorites_list_screen.dart';
 import 'settings_screen.dart';
+import 'notifications_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -39,14 +41,14 @@ class ProfileScreen extends ConsumerWidget {
         onTap: () {},
       ),
       _MenuItem(
-        icon: Icons.chat_bubble_outline,
-        label: l10n.messages,
-        color: AppColors.primary,
+        icon: Icons.auto_awesome_outlined,
+        label: 'Ask AI Guide', // Will use l10n.aiGuide once generated
+        color: const Color(0xFF8B5CF6),
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const ConversationsScreen(),
+              builder: (context) => const AIChatScreen(),
             ),
           );
         },
@@ -75,7 +77,12 @@ class ProfileScreen extends ConsumerWidget {
         icon: Icons.notifications_outlined,
         label: l10n.notifications,
         color: AppColors.warning,
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+          );
+        },
       ),
       _MenuItem(
         icon: themeMode == ThemeMode.dark

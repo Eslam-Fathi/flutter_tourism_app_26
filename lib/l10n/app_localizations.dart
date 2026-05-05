@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Search destinations…'**
   String get searchDestinations;
 
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
   /// No description provided for @browseByCategory.
   ///
   /// In en, this message translates to:
@@ -392,41 +398,41 @@ abstract class AppLocalizations {
   /// **'All'**
   String get categoryAll;
 
-  /// No description provided for @categoryBeach.
+  /// No description provided for @categoryHotels.
   ///
   /// In en, this message translates to:
-  /// **'Beach'**
-  String get categoryBeach;
+  /// **'Hotels'**
+  String get categoryHotels;
 
-  /// No description provided for @categoryMountain.
+  /// No description provided for @categoryApartments.
   ///
   /// In en, this message translates to:
-  /// **'Mountain'**
-  String get categoryMountain;
+  /// **'Apartments'**
+  String get categoryApartments;
 
-  /// No description provided for @categoryCulture.
+  /// No description provided for @categoryTours.
   ///
   /// In en, this message translates to:
-  /// **'Culture'**
-  String get categoryCulture;
+  /// **'Tours'**
+  String get categoryTours;
 
-  /// No description provided for @categoryCity.
+  /// No description provided for @categoryCars.
   ///
   /// In en, this message translates to:
-  /// **'City'**
-  String get categoryCity;
+  /// **'Cars'**
+  String get categoryCars;
 
-  /// No description provided for @categoryAdventure.
+  /// No description provided for @aiGuide.
   ///
   /// In en, this message translates to:
-  /// **'Adventure'**
-  String get categoryAdventure;
+  /// **'Ask AI Guide'**
+  String get aiGuide;
 
-  /// No description provided for @categoryFood.
+  /// No description provided for @askAI.
   ///
   /// In en, this message translates to:
-  /// **'Food'**
-  String get categoryFood;
+  /// **'Ask about Egypt...'**
+  String get askAI;
 }
 
 class _AppLocalizationsDelegate

@@ -1,3 +1,4 @@
+import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../data/models/booking_model.dart';
 import '../base/base_providers.dart';
@@ -13,8 +14,28 @@ class BookingNotifier extends _$BookingNotifier {
 
   Future<List<Booking>> _fetchMyBookings() async {
     final repo = ref.read(bookingRepositoryProvider);
-    final data = await repo.getMyBookings();
-    return data;
+    final user = ref.read(authNotifierProvider).user;
+
+    // Fetch regular traveler bookings
+    final travelerBookings = await repo.getMyBookings();
+
+    // If user is a guide, fetch all company bookings and filter by their ID
+    if (user?.role == 'TourGuide') {
+      try {
+        final allBookings = await repo.getCompanyBookings();
+        final assignedBookings = allBookings.where((b) => b.tourGuide?.id == user?.id).toList();
+        
+        // Merge lists and remove duplicates by ID
+        final combined = [...travelerBookings, ...assignedBookings];
+        final seenIds = <String>{};
+        return combined.where((b) => seenIds.add(b.id)).toList();
+      } catch (e) {
+        // Fallback to traveler bookings if fetching all fails
+        return travelerBookings;
+      }
+    }
+
+    return travelerBookings;
   }
 
   Future<void> refresh() async {
@@ -37,11 +58,15 @@ class BookingNotifier extends _$BookingNotifier {
   Future<void> confirmBooking(String id) async {
     final repo = ref.read(bookingRepositoryProvider);
     await repo.confirmBooking(id);
-    // Note: If we are in company view, we might need to invalidate companyBookingsProvider
-    // but the caller can handle that.
+    await refresh();
+  }
+
+  Future<void> updateStatus(String id, String status) async {
+    final repo = ref.read(bookingRepositoryProvider);
+    await repo.updateBookingStatus(id, status);
+    await refresh();
   }
 }
-
 
 @riverpod
 Future<List<Booking>> companyBookings(CompanyBookingsRef ref) {

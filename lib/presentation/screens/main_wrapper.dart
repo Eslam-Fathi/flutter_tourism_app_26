@@ -9,6 +9,9 @@ import '../screens/explore/explore_screen.dart';
 import '../screens/bookings/my_bookings_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/chat/conversations_screen.dart';
+import '../screens/tour_guide/tour_guide_dashboard_screen.dart';
+import '../../core/network/socket_service.dart';
+import '../providers/base/base_providers.dart';
 import '../../l10n/app_localizations.dart';
 
 
@@ -16,34 +19,13 @@ import '../../l10n/app_localizations.dart';
 class _NavDest {
   final IconData icon;
   final IconData activeIcon;
-  final String Function(AppLocalizations) label;
-  const _NavDest(
-      {required this.icon, required this.activeIcon, required this.label});
+  final String label;
+  const _NavDest({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
 }
-
-final List<_NavDest> _destinations = [
-  _NavDest(
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home_rounded,
-      label: (l) => l.home),
-  _NavDest(
-      icon: Icons.explore_outlined,
-      activeIcon: Icons.explore,
-      label: (l) => l.explore),
-  _NavDest(
-      icon: Icons.luggage_outlined,
-      activeIcon: Icons.luggage,
-      label: (l) => l.bookings),
-  _NavDest(
-      icon: Icons.chat_bubble_outline,
-      activeIcon: Icons.chat_bubble,
-      label: (l) => l.messages),
-  _NavDest(
-      icon: Icons.person_outline,
-      activeIcon: Icons.person_rounded,
-      label: (l) => l.profile),
-];
-
 
 // ── Main Wrapper ──────────────────────────────────────────────────────────
 class MainWrapper extends ConsumerStatefulWidget {
@@ -54,24 +36,91 @@ class MainWrapper extends ConsumerStatefulWidget {
 }
 
 class _MainWrapperState extends ConsumerState<MainWrapper> {
-  // Tab index
   int _currentIndex = 0;
 
   void _onNavTap(int index) {
     setState(() => _currentIndex = index);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isDesktop = Responsive.isDesktop(context);
+  List<_NavDest> _getDestinations(BuildContext context, String role) {
+    final l10n = AppLocalizations.of(context)!;
+    if (role == 'TourGuide') {
+      return [
+        const _NavDest(
+          icon: Icons.dashboard_outlined,
+          activeIcon: Icons.dashboard_rounded,
+          label: 'Dashboard',
+        ),
+        const _NavDest(
+          icon: Icons.calendar_month_outlined,
+          activeIcon: Icons.calendar_month_rounded,
+          label: 'Schedule',
+        ),
+        _NavDest(
+          icon: Icons.chat_bubble_outline,
+          activeIcon: Icons.chat_bubble,
+          label: l10n.messages,
+        ),
+        _NavDest(
+          icon: Icons.person_outline,
+          activeIcon: Icons.person_rounded,
+          label: l10n.profile,
+        ),
+      ];
+    }
 
-    final List<Widget> screens = [
+    return [
+      _NavDest(icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: l10n.home),
+      _NavDest(icon: Icons.explore_outlined, activeIcon: Icons.explore, label: l10n.explore),
+      _NavDest(icon: Icons.luggage_outlined, activeIcon: Icons.luggage, label: l10n.bookings),
+      _NavDest(icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, label: l10n.messages),
+      _NavDest(icon: Icons.person_outline, activeIcon: Icons.person_rounded, label: l10n.profile),
+    ];
+  }
+
+  List<Widget> _getScreens(String role) {
+    if (role == 'TourGuide') {
+      return [
+        const TourGuideDashboardScreen(),
+        const MyBookingsScreen(), // Shows assignments for guides
+        const ConversationsScreen(),
+        const ProfileScreen(),
+      ];
+    }
+
+    return [
       const HomeScreen(),
       const ExploreScreen(),
       const MyBookingsScreen(),
       const ConversationsScreen(),
       const ProfileScreen(),
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(authNotifierProvider).user;
+    final role = user?.role ?? 'User';
+    final destinations = _getDestinations(context, role);
+    final screens = _getScreens(role);
+    
+    // ── Global Socket Connection Logic ──────────────────────────────
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (next.user != null) {
+        ref.read(tokenStorageProvider).getToken().then((token) {
+          if (token != null) {
+            ref.read(socketServiceProvider.notifier).connect(token, 'https://se-yaha.vercel.app');
+          }
+        });
+      }
+    });
+
+    final isDesktop = Responsive.isDesktop(context);
+
+    // Ensure index is within bounds after role switch
+    if (_currentIndex >= screens.length) {
+      _currentIndex = 0;
+    }
 
     // ── Desktop / Web layout ──────────────────────────────────────────
     if (isDesktop) {
@@ -82,6 +131,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
             _DesktopNavRail(
               currentIndex: _currentIndex,
               onTap: _onNavTap,
+              destinations: destinations,
             ),
             // A thin vertical divider
             const VerticalDivider(width: 1, thickness: 1),
@@ -108,6 +158,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
       bottomNavigationBar: _BottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
+        destinations: destinations,
       ),
     );
   }
@@ -117,8 +168,13 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
 class _DesktopNavRail extends ConsumerWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final List<_NavDest> destinations;
 
-  const _DesktopNavRail({required this.currentIndex, required this.onTap});
+  const _DesktopNavRail({
+    required this.currentIndex,
+    required this.onTap,
+    required this.destinations,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -168,7 +224,7 @@ class _DesktopNavRail extends ConsumerWidget {
               child: ListView(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                children: _destinations.asMap().entries.map((entry) {
+                children: destinations.asMap().entries.map((entry) {
                   final i = entry.key;
                   final dest = entry.value;
                   final isSelected = i == currentIndex;
@@ -201,7 +257,7 @@ class _DesktopNavRail extends ConsumerWidget {
                           ),
                           const SizedBox(width: 14),
                           Text(
-                            dest.label(AppLocalizations.of(context)!),
+                            dest.label,
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
@@ -288,8 +344,13 @@ class _DesktopNavRail extends ConsumerWidget {
 class _BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final List<_NavDest> destinations;
 
-  const _BottomNavBar({required this.currentIndex, required this.onTap});
+  const _BottomNavBar({
+    required this.currentIndex,
+    required this.onTap,
+    required this.destinations,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -325,8 +386,8 @@ class _BottomNavBar extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(_destinations.length, (index) {
-                final dest = _destinations[index];
+              children: List.generate(destinations.length, (index) {
+                final dest = destinations[index];
                 final isSelected = index == currentIndex;
                 
                 return Expanded(
@@ -358,7 +419,7 @@ class _BottomNavBar extends StatelessWidget {
                                   ? Colors.white
                                   : Colors.white.withValues(alpha: 0.5),
                             ),
-                            child: Text(dest.label(l10n)),
+                            child: Text(dest.label),
                           ),
                           const SizedBox(height: 2),
                           AnimatedContainer(

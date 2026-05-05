@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/aurora_background.dart';
 import '../../../data/models/service_model.dart';
@@ -92,7 +91,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AlertDialog(
-          backgroundColor: AppColors.surfaceDark.withOpacity(0.8),
+          backgroundColor: AppColors.surfaceDark.withValues(alpha: 0.8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -212,9 +211,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,7 +228,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
               const SizedBox(height: 4),
               Text(
                 'Total to pay',
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
               ),
             ],
           ),
@@ -264,7 +263,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+            color: isSelected ? AppColors.primary : Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected ? Colors.white24 : Colors.white12,
@@ -341,17 +340,17 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-            prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.5)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+            prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.5)),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.05)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
             ),
           ),
         ),
@@ -364,13 +363,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
-          Icon(Icons.apple, size: 64, color: Colors.white.withOpacity(0.8)),
+          Icon(Icons.apple, size: 64, color: Colors.white.withValues(alpha: 0.8)),
           const SizedBox(height: 16),
           const Text(
             'Ready to pay with Apple Pay',
@@ -379,7 +378,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
           const SizedBox(height: 8),
           Text(
             'Fast and secure payment with FaceID',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
           ),
         ],
       ),
@@ -398,7 +397,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -430,12 +429,12 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> with TickerProvid
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.security, size: 14, color: Colors.white.withOpacity(0.4)),
+        Icon(Icons.security, size: 14, color: Colors.white.withValues(alpha: 0.4)),
         const SizedBox(width: 8),
         Text(
           'Secured by SSL Encryption',
           style: TextStyle(
-            color: Colors.white.withOpacity(0.4),
+            color: Colors.white.withValues(alpha: 0.4),
             fontSize: 12,
           ),
         ),

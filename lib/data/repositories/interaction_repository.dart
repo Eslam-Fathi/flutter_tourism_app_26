@@ -32,6 +32,15 @@ class InteractionRepository {
     }
   }
 
+  Future<List<Review>> getServiceReviews(String serviceId) async {
+    try {
+      final response = await _dio.get('/api/services/$serviceId/reviews');
+      return (response.data['data'] as List).map((e) => Review.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   String _handleError(DioException e) {
     if (e.response != null && e.response?.data != null) {
       return e.response?.data['message'] ?? 'An error occurred';

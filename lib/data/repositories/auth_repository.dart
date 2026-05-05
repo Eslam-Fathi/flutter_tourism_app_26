@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import '../../core/network/dio_client.dart';
 import '../../core/storage/token_storage.dart';
 import '../models/auth_models.dart';
 import '../models/user_model.dart';

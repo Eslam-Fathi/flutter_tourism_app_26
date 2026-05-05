@@ -24,7 +24,7 @@ final companyBookingsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CompanyBookingsRef = AutoDisposeFutureProviderRef<List<Booking>>;
-String _$bookingNotifierHash() => r'39da2b69381a510f9aa62db11e9ef5b3f0a7ddcc';
+String _$bookingNotifierHash() => r'1da76726af84613f83695b7d12131a5dbfbbc0e8';
 
 /// See also [BookingNotifier].
 @ProviderFor(BookingNotifier)

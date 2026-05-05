@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
 import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
@@ -16,6 +17,8 @@ import 'package:flutter_tourism_app_26/presentation/screens/home/article_details
 
 import 'package:flutter_tourism_app_26/presentation/providers/admin/article_management_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/widgets/trending_card.dart';
+import '../../providers/notification_provider.dart';
+import '../profile/notifications_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -69,11 +72,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final List<Map<String, dynamic>> categories = [
       {'label': l10n.categoryAll, 'icon': Icons.apps_rounded, 'key': 'All'},
-      {'label': l10n.categoryBeach, 'icon': Icons.beach_access, 'key': 'Beach'},
-      {'label': l10n.categoryMountain, 'icon': Icons.terrain, 'key': 'Mountain'},
-      {'label': l10n.categoryCulture, 'icon': Icons.account_balance, 'key': 'Culture'},
-      {'label': l10n.categoryAdventure, 'icon': Icons.hiking, 'key': 'Adventure'},
-      {'label': l10n.categoryFood, 'icon': Icons.restaurant, 'key': 'Food'},
+      {'label': l10n.categoryHotels, 'icon': Icons.hotel_rounded, 'key': 'Hotel'},
+      {'label': l10n.categoryApartments, 'icon': Icons.apartment_rounded, 'key': 'RealEstate'},
+      {'label': l10n.categoryTours, 'icon': Icons.map_rounded, 'key': 'Tours'},
+      {'label': l10n.categoryCars, 'icon': Icons.directions_car_rounded, 'key': 'Cars'},
     ];
 
 
@@ -128,9 +130,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 actions: [
                   Padding(
                     padding: const EdgeInsets.only(right: 12.0),
-                    child: _CircleIconBtn(
-                      icon: Icons.notifications_outlined,
-                      onTap: () {},
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        _CircleIconBtn(
+                          icon: Icons.notifications_outlined,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                            );
+                          },
+                        ),
+                        if (ref.watch(notificationNotifierProvider.notifier).unreadCount > 0)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '${ref.watch(notificationNotifierProvider.notifier).unreadCount}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -524,12 +561,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isGuest) {
       _showGuestPopup(context);
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ServiceDetailsScreen(service: service),
-        ),
-      );
+      ServiceDetailsScreen.show(context, service);
     }
   }
 
@@ -683,56 +715,68 @@ class _SearchBar extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: controller,
-                    onChanged: onChanged,
-                    decoration: InputDecoration(
-                      hintText: l10n.searchDestinations,
-                      prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      fillColor: Colors.transparent,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    width: 1.5,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.tune,
-                        color: Colors.white,
-                        size: 20,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        onChanged: onChanged,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: l10n.searchDestinations,
+                          hintStyle: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.5),
+                          ),
+                          prefixIcon: const Icon(
+                            LucideIcons.search,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          fillColor: Colors.transparent,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
                       ),
-                      onPressed: onFilterTap,
-                      tooltip: l10n.filter,
-
-
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            LucideIcons.slidersHorizontal,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          onPressed: onFilterTap,
+                          tooltip: l10n.filter,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

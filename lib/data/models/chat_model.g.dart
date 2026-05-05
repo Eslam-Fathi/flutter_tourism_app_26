@@ -11,7 +11,7 @@ _$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) =>
       id: json['_id'] as String,
       booking: json['booking'] as String,
       content: json['content'] as String,
-      sender: User.fromJson(json['sender'] as Map<String, dynamic>),
+      sender: _senderFromJson(json['sender']),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

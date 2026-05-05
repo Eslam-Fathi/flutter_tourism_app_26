@@ -25,6 +25,7 @@ mixin _$ChatMessage {
   String get id => throw _privateConstructorUsedError;
   String get booking => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _senderFromJson)
   User get sender => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -49,7 +50,7 @@ abstract class $ChatMessageCopyWith<$Res> {
     @JsonKey(name: '_id') String id,
     String booking,
     String content,
-    User sender,
+    @JsonKey(fromJson: _senderFromJson) User sender,
     DateTime? createdAt,
   });
 
@@ -128,7 +129,7 @@ abstract class _$$ChatMessageImplCopyWith<$Res>
     @JsonKey(name: '_id') String id,
     String booking,
     String content,
-    User sender,
+    @JsonKey(fromJson: _senderFromJson) User sender,
     DateTime? createdAt,
   });
 
@@ -190,7 +191,7 @@ class _$ChatMessageImpl implements _ChatMessage {
     @JsonKey(name: '_id') required this.id,
     required this.booking,
     required this.content,
-    required this.sender,
+    @JsonKey(fromJson: _senderFromJson) required this.sender,
     this.createdAt,
   });
 
@@ -205,6 +206,7 @@ class _$ChatMessageImpl implements _ChatMessage {
   @override
   final String content;
   @override
+  @JsonKey(fromJson: _senderFromJson)
   final User sender;
   @override
   final DateTime? createdAt;
@@ -251,7 +253,7 @@ abstract class _ChatMessage implements ChatMessage {
     @JsonKey(name: '_id') required final String id,
     required final String booking,
     required final String content,
-    required final User sender,
+    @JsonKey(fromJson: _senderFromJson) required final User sender,
     final DateTime? createdAt,
   }) = _$ChatMessageImpl;
 
@@ -266,6 +268,7 @@ abstract class _ChatMessage implements ChatMessage {
   @override
   String get content;
   @override
+  @JsonKey(fromJson: _senderFromJson)
   User get sender;
   @override
   DateTime? get createdAt;

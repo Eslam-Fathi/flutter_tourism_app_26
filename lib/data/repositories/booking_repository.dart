@@ -17,6 +17,7 @@ class BookingRepository {
     }
   }
 
+
   Future<List<Booking>> getCompanyBookings() async {
     try {
       final response = await _dio.get('/api/bookings/company-bookings');
@@ -36,8 +37,21 @@ class BookingRepository {
   }
 
   Future<Booking> confirmBooking(String id) async {
+    return updateBookingStatus(id, 'confirmed');
+  }
+
+  Future<Booking> updateBookingStatus(String id, String status) async {
     try {
-      final response = await _dio.put('/api/bookings/$id', data: {'status': 'confirmed'});
+      final response = await _dio.put('/api/bookings/$id', data: {'status': status});
+      return Booking.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<Booking> assignGuide(String id, String guideId) async {
+    try {
+      final response = await _dio.put('/api/bookings/$id', data: {'tourGuide': guideId});
       return Booking.fromJson(response.data['data']);
     } on DioException catch (e) {
       throw _handleError(e);

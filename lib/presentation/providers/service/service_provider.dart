@@ -12,10 +12,19 @@ class ServiceNotifier extends _$ServiceNotifier {
     return _fetchServices();
   }
 
-  Future<List<TourismService>> _fetchServices({String search = ''}) async {
-    final response = await ref.read(serviceRepositoryProvider).getAllServices(search: search);
+  Future<List<TourismService>> _fetchServices({
+    String search = '',
+    String? category,
+    double? maxPrice,
+  }) async {
+    final response = await ref.read(serviceRepositoryProvider).getAllServices(
+      search: search,
+      category: category,
+      maxPrice: maxPrice,
+    );
     
     // Filter services to only show those from approved companies
+    // Note: In production, the backend should handle this, but keeping it for safety
     final companies = await ref.read(companyNotifierProvider.future);
     final approvedCompanyIds = companies.where((c) => c.approved).map((c) => c.id).toSet();
     
@@ -30,6 +39,14 @@ class ServiceNotifier extends _$ServiceNotifier {
   Future<void> searchServices(String query) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _fetchServices(search: query));
+  }
+
+  Future<void> applyFilters({String? category, double? maxPrice}) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _fetchServices(
+      category: category,
+      maxPrice: maxPrice,
+    ));
   }
 }
 

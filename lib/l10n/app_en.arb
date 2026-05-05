@@ -17,6 +17,7 @@
   "tripPlans": "Trip Plans",
 
   "searchDestinations": "Search destinations…",
+  "search": "Search",
   "browseByCategory": "Browse by Category",
   "popularThisWeek": "Popular This Week",
   "bookNow": "Book Now",
@@ -60,11 +61,10 @@
   "perPerson": "Per person",
   
   "categoryAll": "All",
-  "categoryBeach": "Beach",
-  "categoryMountain": "Mountain",
-  "categoryCulture": "Culture",
-  "categoryCity": "City",
-  "categoryAdventure": "Adventure",
-  "categoryFood": "Food"
-
+  "categoryHotels": "Hotels",
+  "categoryApartments": "Apartments",
+  "categoryTours": "Tours",
+  "categoryCars": "Cars",
+  "aiGuide": "Ask AI Guide",
+  "askAI": "Ask about Egypt..."
 }

@@ -48,6 +48,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchDestinations => 'ابحث عن وجهات...';
 
   @override
+  String get search => 'بحث';
+
+  @override
   String get browseByCategory => 'تصفح حسب الفئة';
 
   @override
@@ -156,20 +159,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryAll => 'الكل';
 
   @override
-  String get categoryBeach => 'شواطئ';
+  String get categoryHotels => 'Hotels';
 
   @override
-  String get categoryMountain => 'جبال';
+  String get categoryApartments => 'Apartments';
 
   @override
-  String get categoryCulture => 'ثقافة';
+  String get categoryTours => 'Tours';
 
   @override
-  String get categoryCity => 'مدينة';
+  String get categoryCars => 'Cars';
 
   @override
-  String get categoryAdventure => 'مغامرة';
+  String get aiGuide => 'اسأل المساعد الذكي';
 
   @override
-  String get categoryFood => 'طعام';
+  String get askAI => 'اسأل عن مصر...';
 }

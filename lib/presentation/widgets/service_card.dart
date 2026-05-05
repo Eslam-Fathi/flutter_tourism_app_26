@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../data/models/service_model.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -64,7 +65,7 @@ class _ServiceCardState extends State<ServiceCard>
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.08),
+                color: AppColors.primary.withValues(alpha: 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               ),
@@ -82,7 +83,7 @@ class _ServiceCardState extends State<ServiceCard>
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(30)),
                       child: SizedBox(
-                        height: 240,
+                        height: 200,
                         width: double.infinity,
                         child: _imageUrl.isEmpty
                             ? Image.asset('assets/images/bali.png',
@@ -112,7 +113,7 @@ class _ServiceCardState extends State<ServiceCard>
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.25),
+                              Colors.black.withValues(alpha: 0.25),
                             ],
                           ),
                         ),
@@ -134,7 +135,7 @@ class _ServiceCardState extends State<ServiceCard>
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.85),
+                              color: Colors.white.withValues(alpha: 0.85),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -164,9 +165,9 @@ class _ServiceCardState extends State<ServiceCard>
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                _categoryColor(widget.service.category)
-                                    .withOpacity(0.4),
+                                color:
+                                    _categoryColor(widget.service.category)
+                                        .withValues(alpha: 0.4),
                             blurRadius: 8,
                           ),
                         ],
@@ -200,7 +201,10 @@ class _ServiceCardState extends State<ServiceCard>
                                 .textTheme
                                 .titleLarge
                                 ?.copyWith(
-                                    fontWeight: FontWeight.w800, fontSize: 18),
+                                    fontWeight: FontWeight.w900, 
+                                    fontSize: 19,
+                                    letterSpacing: -0.5,
+                                ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -242,15 +246,16 @@ class _ServiceCardState extends State<ServiceCard>
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.location_on,
+                        const Icon(LucideIcons.mapPin,
                             color: AppColors.primary, size: 14),
-                        const SizedBox(width: 3),
+                        const SizedBox(width: 4),
                         Flexible(
                           child: Text(
                             widget.service.location,
                             style: const TextStyle(
                               color: AppColors.textMuted,
-                              fontSize: 13,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

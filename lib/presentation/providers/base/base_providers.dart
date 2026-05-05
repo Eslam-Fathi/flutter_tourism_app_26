@@ -8,6 +8,7 @@ import '../../../data/repositories/company_repository.dart';
 import '../../../data/repositories/interaction_repository.dart';
 import '../../../data/repositories/chat_repository.dart';
 import '../../../data/repositories/user_repository.dart';
+import '../../../data/repositories/notification_repository.dart';
 import '../../../core/network/supabase_config.dart';
 import '../../../data/repositories/article_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
@@ -77,4 +78,10 @@ ChatRepository chatRepository(ChatRepositoryRef ref) {
 UserRepository userRepository(UserRepositoryRef ref) {
   final client = ref.watch(dioClientProvider);
   return UserRepository(dio: client.instance);
+}
+
+@Riverpod(keepAlive: true)
+NotificationRepository notificationRepository(NotificationRepositoryRef ref) {
+  final client = ref.watch(dioClientProvider);
+  return NotificationRepository(dio: client.instance);
 }

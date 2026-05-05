@@ -168,8 +168,8 @@ class _$UserImpl implements _User {
   const _$UserImpl({
     @JsonKey(name: '_id') required this.id,
     required this.name,
-    required this.email,
-    required this.role,
+    this.email = '',
+    this.role = 'User',
     this.avatar,
   });
 
@@ -182,8 +182,10 @@ class _$UserImpl implements _User {
   @override
   final String name;
   @override
+  @JsonKey()
   final String email;
   @override
+  @JsonKey()
   final String role;
   @override
   final String? avatar;
@@ -227,8 +229,8 @@ abstract class _User implements User {
   const factory _User({
     @JsonKey(name: '_id') required final String id,
     required final String name,
-    required final String email,
-    required final String role,
+    final String email,
+    final String role,
     final String? avatar,
   }) = _$UserImpl;
 

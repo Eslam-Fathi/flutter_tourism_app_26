@@ -6,8 +6,11 @@ import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/base/base_providers.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/company/company_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/service/service_provider.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
+import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/data/models/user_model.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/user/user_provider.dart';
+import 'package:flutter_tourism_app_26/presentation/screens/company/widgets/guide_selection_dialog.dart';
 
 class CompanyServicesScreen extends ConsumerWidget {
   const CompanyServicesScreen({super.key});
@@ -140,18 +143,34 @@ class CompanyServicesScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              Text(
-                                '\$${service.price.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Colors.greenAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                Text(
+                                  '\$${service.price.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    color: Colors.greenAccent,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }, childCount: services.length),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => _CreateServiceDialog(service: service),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.edit_outlined, color: Colors.white54, size: 20),
+                                  tooltip: 'Edit Trip',
+                                ),
+                                IconButton(
+                                  onPressed: () => _confirmDelete(context, ref, service),
+                                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                                  tooltip: 'Delete Trip',
+                                ),
+                              ],
+                            ),
+                          );
+                        }, childCount: services.length),
                     );
                   },
                   loading: () => const SliverToBoxAdapter(
@@ -178,10 +197,51 @@ class CompanyServicesScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, dynamic service) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Trip Plan?', style: TextStyle(color: Colors.white)),
+        content: Text('Are you sure you want to delete "${service.title}"? This action cannot be undone.', 
+          style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref.read(serviceRepositoryProvider).deleteService(service.id);
+                ref.read(serviceNotifierProvider.notifier).refresh();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Trip Plan deleted successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CreateServiceDialog extends ConsumerStatefulWidget {
-  const _CreateServiceDialog();
+  final dynamic service;
+  const _CreateServiceDialog({this.service});
 
   @override
   ConsumerState<_CreateServiceDialog> createState() =>
@@ -198,6 +258,24 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
   final _imageUrlController = TextEditingController();
 
   bool _isLoading = false;
+  User? _selectedGuide;
+  bool _guideInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.service != null) {
+      _titleController.text = widget.service.title;
+      _priceController.text = widget.service.price.toString();
+      _locationController.text = widget.service.location;
+      _descriptionController.text = widget.service.cleanDescription ?? '';
+      _imageUrls.addAll(List<String>.from(widget.service.images));
+      _selectedCategory = ServiceCategory.values.firstWhere(
+        (c) => c.value == widget.service.category,
+        orElse: () => ServiceCategory.tours,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -234,7 +312,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       if (price == null) throw 'Invalid price format';
 
       final repo = ref.read(serviceRepositoryProvider);
-      await repo.createService({
+      final serviceData = {
         'title': _titleController.text.trim(),
         'description': _descriptionController.text.trim(),
         'price': price,
@@ -242,7 +320,17 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
         'category': _selectedCategory!.value,
         'company': myCompanyProfile.id,
         'images': _imageUrls,
-      });
+      };
+
+      if (_selectedGuide != null) {
+        serviceData['description'] = '${_descriptionController.text.trim()}\n\n[[guideId:${_selectedGuide!.id}]]';
+      }
+
+      if (widget.service != null) {
+        await repo.updateService(widget.service.id, serviceData);
+      } else {
+        await repo.createService(serviceData);
+      }
 
       // Refresh services
       ref.read(serviceNotifierProvider.notifier).refresh();
@@ -250,10 +338,10 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Trip Plan created successfully!',
-              style: TextStyle(color: Colors.white),
+              widget.service != null ? 'Trip Plan updated successfully!' : 'Trip Plan created successfully!',
+              style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
@@ -307,13 +395,13 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.map, color: Colors.blueAccent, size: 28),
-                          SizedBox(width: 12),
+                          const Icon(Icons.map, color: Colors.blueAccent, size: 28),
+                          const SizedBox(width: 12),
                           Text(
-                            'New Trip Plan',
-                            style: TextStyle(
+                            widget.service != null ? 'Edit Trip Plan' : 'New Trip Plan',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -339,6 +427,8 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                       _buildTextField('Location*', _locationController),
                       const SizedBox(height: 16),
                       _buildCategoryDropdown(),
+                      const SizedBox(height: 16),
+                      _buildGuideSelector(),
                       const SizedBox(height: 24),
                       const Text(
                         'Images',
@@ -466,9 +556,9 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text(
-                                    'Create',
-                                    style: TextStyle(
+                                : Text(
+                                    widget.service != null ? 'Update' : 'Create',
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -488,7 +578,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<ServiceCategory>(
-      value: _selectedCategory,
+      initialValue: _selectedCategory,
       dropdownColor: AppColors.surfaceDark,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -509,6 +599,69 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
         return DropdownMenuItem(value: cat, child: Text(cat.label));
       }).toList(),
       onChanged: (val) => setState(() => _selectedCategory = val),
+    );
+  }
+
+  Widget _buildGuideSelector() {
+    // Initialize guide if editing
+    if (!_guideInitialized && widget.service != null) {
+      final guideId = widget.service.assignedGuideId;
+      if (guideId != null) {
+        final guidesAsync = ref.watch(tourGuidesProvider);
+        guidesAsync.whenData((guides) {
+          try {
+            _selectedGuide = guides.firstWhere((g) => g.id == guideId);
+            _guideInitialized = true;
+            setState(() {});
+          } catch (_) {}
+        });
+      }
+    }
+
+    return InkWell(
+      onTap: () async {
+        final guide = await showDialog<User>(
+          context: context,
+          builder: (context) => GuideSelectionDialog(
+            initialSelectedGuide: _selectedGuide,
+          ),
+        );
+        if (guide != null) {
+          setState(() => _selectedGuide = guide);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white12,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.person_pin, color: Colors.blueAccent),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _selectedGuide != null
+                    ? 'Guide: ${_selectedGuide!.name}'
+                    : 'Select Tour Guide (Optional)',
+                style: TextStyle(
+                  color: _selectedGuide != null ? Colors.white : Colors.white38,
+                ),
+              ),
+            ),
+            if (_selectedGuide != null)
+              IconButton(
+                icon: const Icon(Icons.close, size: 20, color: Colors.white54),
+                onPressed: () => setState(() => _selectedGuide = null),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              )
+            else
+              const Icon(Icons.arrow_drop_down, color: Colors.white54),
+          ],
+        ),
+      ),
     );
   }
 

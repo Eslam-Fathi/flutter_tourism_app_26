@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/booking/booking_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/data/models/user_model.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/base/base_providers.dart';
+import 'widgets/guide_selection_dialog.dart';
 
 class CompanyBookingsScreen extends ConsumerWidget {
   const CompanyBookingsScreen({super.key});
@@ -51,7 +55,7 @@ class CompanyBookingsScreen extends ConsumerWidget {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceDark.withOpacity(0.6),
+                            color: AppColors.surfaceDark.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.white12),
                           ),
@@ -76,8 +80,12 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       color: booking.status == 'confirmed'
-                                          ? Colors.green.withOpacity(0.2)
-                                          : Colors.orange.withOpacity(0.2),
+                                          ? Colors.green.withValues(alpha: 0.2)
+                                          : booking.status == 'cancelled'
+                                          ? Colors.red.withValues(alpha: 0.2)
+                                          : Colors.orange.withValues(
+                                              alpha: 0.2,
+                                            ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -85,6 +93,8 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                       style: TextStyle(
                                         color: booking.status == 'confirmed'
                                             ? Colors.greenAccent
+                                            : booking.status == 'cancelled'
+                                            ? Colors.redAccent
                                             : Colors.orangeAccent,
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
@@ -120,19 +130,24 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              if (booking.notes != null && booking.notes!.isNotEmpty) ...[
+                              if (booking.notes != null &&
+                                  booking.notes!.isNotEmpty) ...[
                                 const SizedBox(height: 12),
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.05),
+                                    color: Colors.white.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.note_outlined,
-                                          size: 14, color: Colors.amberAccent),
+                                      const Icon(
+                                        Icons.note_outlined,
+                                        size: 14,
+                                        color: Colors.amberAccent,
+                                      ),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
@@ -161,51 +176,138 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  if (booking.status != 'confirmed')
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.greenAccent,
-                                        foregroundColor: Colors.black,
-                                        minimumSize: const Size(0, 32),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
+                                  if (booking.tourGuide != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
                                       ),
-                                      onPressed: () async {
-                                        try {
-                                          await ref
-                                              .read(bookingNotifierProvider
-                                                  .notifier)
-                                              .confirmBooking(booking.id);
-                                          ref.invalidate(companyBookingsProvider);
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    'Booking confirmed!'),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: Text('Error: $e'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                      child: const Text(
-                                        'Confirm',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: Colors.blue.withValues(alpha: 0.2),
                                         ),
                                       ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            LucideIcons.userCheck,
+                                            size: 14,
+                                            color: Colors.blueAccent,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            booking.tourGuide!.name,
+                                            style: const TextStyle(
+                                              color: Colors.blueAccent,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (booking.status == 'pending')
+                                    Row(
+                                      children: [
+                                        TextButton(
+                                          onPressed: () => _handleStatusUpdate(
+                                            context,
+                                            ref,
+                                            booking.id,
+                                            'cancelled',
+                                          ),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: Colors.redAccent,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'Reject',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.greenAccent,
+                                            foregroundColor: Colors.black,
+                                            minimumSize: const Size(0, 32),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          onPressed: () => _handleStatusUpdate(
+                                            context,
+                                            ref,
+                                            booking.id,
+                                            'confirmed',
+                                          ),
+                                          child: const Text(
+                                            'Confirm',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  if (booking.status == 'confirmed' &&
+                                      booking.tourGuide == null)
+                                    ElevatedButton.icon(
+                                      onPressed: () => _showGuideSelection(
+                                        context,
+                                        ref,
+                                        booking.id,
+                                      ),
+                                      icon: const Icon(
+                                        LucideIcons.userPlus,
+                                        size: 14,
+                                      ),
+                                      label: const Text(
+                                        'Assign Guide',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: Colors.white,
+                                        minimumSize: const Size(0, 32),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if (booking.status == 'confirmed' &&
+                                      booking.tourGuide != null)
+                                    IconButton(
+                                      onPressed: () => _showGuideSelection(
+                                        context,
+                                        ref,
+                                        booking.id,
+                                        booking.tourGuide?.id,
+                                      ),
+                                      icon: const Icon(
+                                        LucideIcons.userCheck,
+                                        size: 16,
+                                        color: Colors.white70,
+                                      ),
+                                      tooltip: 'Change Guide',
                                     ),
                                 ],
                               ),
@@ -238,5 +340,79 @@ class CompanyBookingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleStatusUpdate(
+    BuildContext context,
+    WidgetRef ref,
+    String bookingId,
+    String status,
+  ) async {
+    try {
+      await ref
+          .read(bookingNotifierProvider.notifier)
+          .updateStatus(bookingId, status);
+      // Explicitly invalidate company bookings to ensure UI refresh
+      ref.invalidate(companyBookingsProvider);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Booking ${status == 'confirmed' ? 'confirmed' : 'rejected'} successfully',
+            ),
+            backgroundColor: status == 'confirmed'
+                ? Colors.green
+                : Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+  Future<void> _showGuideSelection(
+    BuildContext context,
+    WidgetRef ref,
+    String bookingId, [
+    String? currentGuideId,
+  ]) async {
+
+
+    final guide = await showDialog<User>(
+      context: context,
+      builder: (context) => const GuideSelectionDialog(),
+    );
+
+    if (guide != null && context.mounted) {
+      try {
+        await ref.read(bookingRepositoryProvider).assignGuide(bookingId, guide.id);
+        // Explicitly invalidate company bookings to ensure UI refresh
+        ref.invalidate(companyBookingsProvider);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tour guide assigned successfully'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'), 
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
   }
 }

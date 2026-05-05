@@ -199,7 +199,7 @@ class CompanyDashboardOverview extends ConsumerWidget {
         final servicesCount = servicesAsync.valueOrNull?.length ?? 0;
         final bookingsCount = bookingsAsync.valueOrNull?.length ?? 0;
         final totalRevenue = bookingsAsync.valueOrNull?.fold(0.0, (sum, b) => 
-          (b.status == 'confirmed' || b.status == 'completed') ? sum! + b.totalPrice : sum) ?? 0.0;
+          (b.status == 'confirmed' || b.status == 'completed') ? sum + b.totalPrice : sum) ?? 0.0;
 
         return Wrap(
           spacing: 16,

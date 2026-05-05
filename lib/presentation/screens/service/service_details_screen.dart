@@ -5,8 +5,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import '../../../data/models/service_model.dart';
+import '../../../data/models/user_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../bookings/booking_form_screen.dart';
+import '../../providers/auth/auth_provider.dart';
+import '../../providers/booking/booking_provider.dart';
+import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
+import 'widgets/review_widgets.dart';
+import '../../providers/user/user_provider.dart';
 
 class ServiceDetailsScreen extends ConsumerStatefulWidget {
   final TourismService service;
@@ -16,12 +22,40 @@ class ServiceDetailsScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<ServiceDetailsScreen> createState() =>
       _ServiceDetailsScreenState();
+
+  static void show(BuildContext context, TourismService service) {
+    if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
+      showDialog(
+        context: context,
+        barrierColor: Colors.black.withValues(alpha: 0.6),
+        builder: (context) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900, maxHeight: 850),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: ServiceDetailsScreen(service: service),
+            ),
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ServiceDetailsScreen(service: service),
+        ),
+      );
+    }
+  }
 }
 
 class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
     with SingleTickerProviderStateMixin {
   bool _isFavorited = false;
   DateTimeRange? _selectedDates;
+  String? _selectedGuideId;
   late TabController _infoTabController;
 
   String get _imageUrl =>
@@ -161,7 +195,7 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                                 .service
                                                 .category] ??
                                             AppColors.primary)
-                                        .withOpacity(0.12),
+                                        .withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -264,7 +298,7 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: Colors.black.withValues(alpha: 0.06),
                                   blurRadius: 4,
                                 ),
                               ],
@@ -292,13 +326,32 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                             physics: const NeverScrollableScrollPhysics(),
                             children: [
                               // Overview tab
-                              Text(
-                                widget.service.description ??
-                                    'Experience the breathtaking beauty of ${widget.service.location}. Immerse yourself in the local culture, enjoy stunning views, and create memories that will last a lifetime. Our expert guides ensure you have a safe and unforgettable journey through this magnificent destination.',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: AppColors.textBody,
-                                  height: 1.6,
+                              SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.service.cleanDescription.isEmpty
+                                          ? 'Experience the breathtaking beauty of ${widget.service.location}. Immerse yourself in the local culture, enjoy stunning views, and create memories that will last a lifetime. Our expert guides ensure you have a safe and unforgettable journey through this magnificent destination.'
+                                          : widget.service.cleanDescription,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        color: AppColors.textBody,
+                                        height: 1.6,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    const Text(
+                                      'Choose Your Preferred Guide',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: AppColors.textBody,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _buildGuideSelector(),
+                                  ],
                                 ),
                               ),
                               // Itinerary tab
@@ -321,24 +374,14 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                 ],
                               ),
                               // Reviews tab
-                              const Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.rate_review_outlined,
-                                      size: 36,
-                                      color: AppColors.textMuted,
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Reviews coming soon',
-                                      style: TextStyle(
-                                        color: AppColors.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              Column(
+                                children: [
+                                  Expanded(
+                                    child: ReviewList(serviceId: widget.service.id),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildAddReviewButton(context, ref),
+                                ],
                               ),
                             ],
                           ),
@@ -350,10 +393,10 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.06),
+                              color: AppColors.primary.withValues(alpha: 0.06),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: AppColors.primary.withOpacity(0.2),
+                                color: AppColors.primary.withValues(alpha: 0.2),
                               ),
                             ),
                             child: Row(
@@ -457,9 +500,9 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                 child: Container(
                   padding: EdgeInsets.fromLTRB(24, 20, 24, 20 + bottomPad),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.92),
+                    color: Colors.white.withValues(alpha: 0.92),
                     border: Border(
-                      top: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      top: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
                     ),
                   ),
                   child: Row(
@@ -504,7 +547,7 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.4),
+                                  color: AppColors.primary.withValues(alpha: 0.4),
                                   blurRadius: 14,
                                   offset: const Offset(0, 6),
                                 ),
@@ -519,13 +562,13 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                                 ),
                               ),
                               onPressed: () {
-                                // Navigate to the full booking form screen
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => BookingFormScreen(
+                                    builder: (context) => BookingFormScreen(
                                       service: widget.service,
                                       initialDates: _selectedDates,
+                                      initialGuideId: _selectedGuideId,
                                     ),
                                   ),
                                 );
@@ -552,6 +595,228 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
       ),
     );
   }
+
+  Widget _buildAddReviewButton(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final bookingsAsync = ref.watch(bookingNotifierProvider);
+    
+    final user = authState.user;
+    if (user == null) return const SizedBox.shrink();
+
+    return bookingsAsync.when(
+      data: (bookings) {
+        final hasConfirmedBooking = bookings.any((b) => 
+          b.tourismService.id == widget.service.id && b.status == 'confirmed'
+        );
+        final isAdmin = user.role == 'Admin';
+
+        if (!hasConfirmedBooking && !isAdmin) return const SizedBox.shrink();
+
+        return SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => AddReviewSheet(serviceId: widget.service.id),
+              );
+            },
+            icon: const Icon(Icons.add_comment_rounded, size: 18),
+            label: const Text('Write a Review'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              side: const BorderSide(color: AppColors.primary),
+              foregroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildGuideSelector() {
+    final guidesAsync = ref.watch(tourGuidesProvider);
+
+    return guidesAsync.when(
+      data: (guides) {
+        if (guides.isEmpty) return const SizedBox.shrink();
+
+        return SizedBox(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: guides.length,
+            itemBuilder: (context, index) {
+              final guide = guides[index];
+              final isSelected = _selectedGuideId == guide.id;
+
+              return GestureDetector(
+                onTap: () => setState(() => _selectedGuideId = isSelected ? null : guide.id),
+                child: Container(
+                  width: 80,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Colors.black.withValues(alpha: 0.05),
+                      width: 2,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        backgroundImage: (guide.avatar != null && guide.avatar!.isNotEmpty)
+                            ? NetworkImage(guide.avatar!)
+                            : null,
+                        child: (guide.avatar == null || guide.avatar!.isEmpty)
+                            ? Text(
+                                guide.name[0].toUpperCase(),
+                                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                              )
+                            : null,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        guide.name.split(' ').first,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? AppColors.primary : AppColors.textBody,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildGuideInfo(dynamic guideOrId) {
+    if (guideOrId == null) return const SizedBox.shrink();
+    
+    if (guideOrId is User) {
+      return _buildGuideUI(guideOrId);
+    }
+    
+    final userRole = ref.watch(authNotifierProvider).user?.role;
+    final guideAsync = ref.watch(userByIdProvider(guideOrId.toString()));
+
+    return guideAsync.when(
+      data: (guide) {
+        if (guide != null) return _buildGuideUI(guide);
+        
+        // Fallback for travelers if guide fetch returned null (e.g. due to 403)
+        if (userRole?.toLowerCase() == 'user') {
+          return _buildGuideUI(User(
+            id: guideOrId.toString(),
+            name: 'Professional Guide',
+            email: '',
+            role: 'guide',
+          ));
+        }
+        return const SizedBox.shrink();
+      },
+      loading: () => const SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
+      error: (error, stack) {
+        // If forbidden (403), it means the user is a traveler and cannot fetch user details directly.
+        // We show a skeleton "Assigned Guide" instead of an error or empty space.
+        if (error.toString().contains('403') || userRole?.toLowerCase() == 'user') {
+          return _buildGuideUI(User(
+            id: guideOrId.toString(),
+            name: 'Professional Guide',
+            email: '',
+            role: 'guide',
+          ));
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildGuideUI(User guide) {
+    return Container(
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: (guide.avatar != null && guide.avatar!.isNotEmpty)
+                    ? NetworkImage(guide.avatar!)
+                    : null,
+                child: (guide.avatar == null || guide.avatar!.isEmpty)
+                    ? Text(guide.name[0].toUpperCase())
+                    : null,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      guide.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const Text(
+                      'Certified Tour Guide',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('You can start a chat with your guide as soon as you book this service!'),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                ),
+              ),
+            ],
+          ),
+        );
+  }
 }
 
 class _CircleNavBtn extends StatelessWidget {
@@ -577,9 +842,9 @@ class _CircleNavBtn extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Icon(icon, color: iconColor ?? Colors.white, size: 20),
           ),
@@ -606,9 +871,9 @@ class _InfoPill extends StatelessWidget {
       margin: const EdgeInsets.only(right: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

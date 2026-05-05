@@ -210,7 +210,7 @@ class _CreateCompanyDialogState extends ConsumerState<CreateCompanyDialog> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<CompanyCategory>(
-      value: _selectedCategory,
+      initialValue: _selectedCategory,
       dropdownColor: AppColors.surfaceDark,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

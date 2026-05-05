@@ -8,6 +8,7 @@ part 'company_provider.g.dart';
 
 @riverpod
 class CompanyNotifier extends _$CompanyNotifier {
+  @override
   FutureOr<List<Company>> build() async {
     final repo = ref.read(companyRepositoryProvider);
     // Use admin endpoint so pending (unapproved) companies are included.

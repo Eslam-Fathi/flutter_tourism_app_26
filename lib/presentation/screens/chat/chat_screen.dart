@@ -23,9 +23,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(chatNotifierProvider.notifier).initChat(widget.booking.id);
-    });
   }
 
   @override
@@ -40,7 +37,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (text.isEmpty) return;
 
     // Send the message using the provider
-    ref.read(chatNotifierProvider.notifier).sendMessage(text);
+    ref.read(chatNotifierProvider(widget.booking.id).notifier).sendMessage(text);
     
     _messageController.clear();
     
@@ -56,11 +53,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatState = ref.watch(chatNotifierProvider);
+    final chatState = ref.watch(chatNotifierProvider(widget.booking.id));
     final user = ref.watch(authNotifierProvider).user;
     final service = widget.booking.tourismService;
 
+    final chatPartner = (widget.booking.user?.id == user?.id) 
+        ? widget.booking.tourGuide 
+        : widget.booking.user;
+    
+    final partnerName = chatPartner?.name ?? service.title;
+    final partnerAvatar = chatPartner?.avatar;
+
     List<ChatMessage> messages = chatState.valueOrNull ?? [];
+    final displayMessages = messages.reversed.toList();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -70,9 +75,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              backgroundImage: service.images.isNotEmpty ? AssetImage(service.images.first) : null,
-              child: service.images.isEmpty ? Text(
-                service.title.substring(0, 1).toUpperCase(),
+              backgroundImage: (partnerAvatar != null && partnerAvatar.isNotEmpty)
+                  ? NetworkImage(partnerAvatar)
+                  : null,
+              child: (partnerAvatar == null || partnerAvatar.isEmpty) ? Text(
+                partnerName.substring(0, 1).toUpperCase(),
                 style: const TextStyle(fontSize: 14, color: AppColors.primary),
               ) : null,
             ),
@@ -82,7 +89,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    service.company ?? service.title,
+                    partnerName,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -95,9 +102,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: AppColors.backgroundDark,
         iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 1,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.white.withValues(alpha: 0.05),
+            height: 1,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -108,10 +122,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   : ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                      itemCount: messages.length,
+                      itemCount: displayMessages.length,
+                      reverse: true,
                       itemBuilder: (context, index) {
-                        final msg = messages[index];
-                        final isMe = msg.sender.id == user?.id || msg.sender.role == 'User';
+                        final msg = displayMessages[index];
+                        final isMe = msg.sender.id == user?.id;
                         return _buildChatBubble(msg, isMe);
                       },
                     ),

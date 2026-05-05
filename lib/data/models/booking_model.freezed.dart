@@ -191,18 +191,20 @@ Booking _$BookingFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Booking {
   @JsonKey(name: '_id')
-  String get id => throw _privateConstructorUsedError; // The backend might return service as a populated object OR a string ID.
-  // We parse it into a TourismService object if possible, otherwise we
-  // handle it resiliently.
-  @JsonKey(name: 'service', fromJson: _parseService)
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readService, fromJson: _parseService)
   TourismService get tourismService => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _parseId)
-  String get user => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readUser, fromJson: _parseUser)
+  User? get user => throw _privateConstructorUsedError;
   BookingDates get dates => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
   double get totalPrice => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readCreatedAt)
   DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  User? get tourGuide => throw _privateConstructorUsedError;
 
   /// Serializes this Booking to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -220,18 +222,22 @@ abstract class $BookingCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    @JsonKey(name: 'service', fromJson: _parseService)
+    @JsonKey(readValue: _readService, fromJson: _parseService)
     TourismService tourismService,
-    @JsonKey(fromJson: _parseId) String user,
+    @JsonKey(readValue: _readUser, fromJson: _parseUser) User? user,
     BookingDates dates,
     String status,
+    @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
     double totalPrice,
     String? notes,
-    DateTime createdAt,
+    @JsonKey(readValue: _readCreatedAt) DateTime createdAt,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) User? tourGuide,
   });
 
   $TourismServiceCopyWith<$Res> get tourismService;
+  $UserCopyWith<$Res>? get user;
   $BookingDatesCopyWith<$Res> get dates;
+  $UserCopyWith<$Res>? get tourGuide;
 }
 
 /// @nodoc
@@ -251,12 +257,13 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
   $Res call({
     Object? id = null,
     Object? tourismService = null,
-    Object? user = null,
+    Object? user = freezed,
     Object? dates = null,
     Object? status = null,
     Object? totalPrice = null,
     Object? notes = freezed,
     Object? createdAt = null,
+    Object? tourGuide = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -268,10 +275,10 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
                 ? _value.tourismService
                 : tourismService // ignore: cast_nullable_to_non_nullable
                       as TourismService,
-            user: null == user
+            user: freezed == user
                 ? _value.user
                 : user // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as User?,
             dates: null == dates
                 ? _value.dates
                 : dates // ignore: cast_nullable_to_non_nullable
@@ -292,6 +299,10 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            tourGuide: freezed == tourGuide
+                ? _value.tourGuide
+                : tourGuide // ignore: cast_nullable_to_non_nullable
+                      as User?,
           )
           as $Val,
     );
@@ -311,9 +322,37 @@ class _$BookingCopyWithImpl<$Res, $Val extends Booking>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Booking
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
   $BookingDatesCopyWith<$Res> get dates {
     return $BookingDatesCopyWith<$Res>(_value.dates, (value) {
       return _then(_value.copyWith(dates: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Booking
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get tourGuide {
+    if (_value.tourGuide == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.tourGuide!, (value) {
+      return _then(_value.copyWith(tourGuide: value) as $Val);
     });
   }
 }
@@ -328,20 +367,26 @@ abstract class _$$BookingImplCopyWith<$Res> implements $BookingCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    @JsonKey(name: 'service', fromJson: _parseService)
+    @JsonKey(readValue: _readService, fromJson: _parseService)
     TourismService tourismService,
-    @JsonKey(fromJson: _parseId) String user,
+    @JsonKey(readValue: _readUser, fromJson: _parseUser) User? user,
     BookingDates dates,
     String status,
+    @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
     double totalPrice,
     String? notes,
-    DateTime createdAt,
+    @JsonKey(readValue: _readCreatedAt) DateTime createdAt,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) User? tourGuide,
   });
 
   @override
   $TourismServiceCopyWith<$Res> get tourismService;
   @override
+  $UserCopyWith<$Res>? get user;
+  @override
   $BookingDatesCopyWith<$Res> get dates;
+  @override
+  $UserCopyWith<$Res>? get tourGuide;
 }
 
 /// @nodoc
@@ -360,12 +405,13 @@ class __$$BookingImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? tourismService = null,
-    Object? user = null,
+    Object? user = freezed,
     Object? dates = null,
     Object? status = null,
     Object? totalPrice = null,
     Object? notes = freezed,
     Object? createdAt = null,
+    Object? tourGuide = freezed,
   }) {
     return _then(
       _$BookingImpl(
@@ -377,10 +423,10 @@ class __$$BookingImplCopyWithImpl<$Res>
             ? _value.tourismService
             : tourismService // ignore: cast_nullable_to_non_nullable
                   as TourismService,
-        user: null == user
+        user: freezed == user
             ? _value.user
             : user // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as User?,
         dates: null == dates
             ? _value.dates
             : dates // ignore: cast_nullable_to_non_nullable
@@ -401,6 +447,10 @@ class __$$BookingImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        tourGuide: freezed == tourGuide
+            ? _value.tourGuide
+            : tourGuide // ignore: cast_nullable_to_non_nullable
+                  as User?,
       ),
     );
   }
@@ -411,14 +461,16 @@ class __$$BookingImplCopyWithImpl<$Res>
 class _$BookingImpl implements _Booking {
   const _$BookingImpl({
     @JsonKey(name: '_id') required this.id,
-    @JsonKey(name: 'service', fromJson: _parseService)
+    @JsonKey(readValue: _readService, fromJson: _parseService)
     required this.tourismService,
-    @JsonKey(fromJson: _parseId) required this.user,
+    @JsonKey(readValue: _readUser, fromJson: _parseUser) this.user,
     required this.dates,
     this.status = 'pending',
+    @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
     this.totalPrice = 0.0,
     this.notes,
-    required this.createdAt,
+    @JsonKey(readValue: _readCreatedAt) required this.createdAt,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) this.tourGuide,
   });
 
   factory _$BookingImpl.fromJson(Map<String, dynamic> json) =>
@@ -427,31 +479,32 @@ class _$BookingImpl implements _Booking {
   @override
   @JsonKey(name: '_id')
   final String id;
-  // The backend might return service as a populated object OR a string ID.
-  // We parse it into a TourismService object if possible, otherwise we
-  // handle it resiliently.
   @override
-  @JsonKey(name: 'service', fromJson: _parseService)
+  @JsonKey(readValue: _readService, fromJson: _parseService)
   final TourismService tourismService;
   @override
-  @JsonKey(fromJson: _parseId)
-  final String user;
+  @JsonKey(readValue: _readUser, fromJson: _parseUser)
+  final User? user;
   @override
   final BookingDates dates;
   @override
   @JsonKey()
   final String status;
   @override
-  @JsonKey()
+  @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
   final double totalPrice;
   @override
   final String? notes;
   @override
+  @JsonKey(readValue: _readCreatedAt)
   final DateTime createdAt;
+  @override
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  final User? tourGuide;
 
   @override
   String toString() {
-    return 'Booking(id: $id, tourismService: $tourismService, user: $user, dates: $dates, status: $status, totalPrice: $totalPrice, notes: $notes, createdAt: $createdAt)';
+    return 'Booking(id: $id, tourismService: $tourismService, user: $user, dates: $dates, status: $status, totalPrice: $totalPrice, notes: $notes, createdAt: $createdAt, tourGuide: $tourGuide)';
   }
 
   @override
@@ -469,7 +522,9 @@ class _$BookingImpl implements _Booking {
                 other.totalPrice == totalPrice) &&
             (identical(other.notes, notes) || other.notes == notes) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.tourGuide, tourGuide) ||
+                other.tourGuide == tourGuide));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -484,6 +539,7 @@ class _$BookingImpl implements _Booking {
     totalPrice,
     notes,
     createdAt,
+    tourGuide,
   );
 
   /// Create a copy of Booking
@@ -503,39 +559,45 @@ class _$BookingImpl implements _Booking {
 abstract class _Booking implements Booking {
   const factory _Booking({
     @JsonKey(name: '_id') required final String id,
-    @JsonKey(name: 'service', fromJson: _parseService)
+    @JsonKey(readValue: _readService, fromJson: _parseService)
     required final TourismService tourismService,
-    @JsonKey(fromJson: _parseId) required final String user,
+    @JsonKey(readValue: _readUser, fromJson: _parseUser) final User? user,
     required final BookingDates dates,
     final String status,
+    @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
     final double totalPrice,
     final String? notes,
-    required final DateTime createdAt,
+    @JsonKey(readValue: _readCreatedAt) required final DateTime createdAt,
+    @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+    final User? tourGuide,
   }) = _$BookingImpl;
 
   factory _Booking.fromJson(Map<String, dynamic> json) = _$BookingImpl.fromJson;
 
   @override
   @JsonKey(name: '_id')
-  String get id; // The backend might return service as a populated object OR a string ID.
-  // We parse it into a TourismService object if possible, otherwise we
-  // handle it resiliently.
+  String get id;
   @override
-  @JsonKey(name: 'service', fromJson: _parseService)
+  @JsonKey(readValue: _readService, fromJson: _parseService)
   TourismService get tourismService;
   @override
-  @JsonKey(fromJson: _parseId)
-  String get user;
+  @JsonKey(readValue: _readUser, fromJson: _parseUser)
+  User? get user;
   @override
   BookingDates get dates;
   @override
   String get status;
   @override
+  @JsonKey(readValue: _readTotalPrice, fromJson: _parsePrice)
   double get totalPrice;
   @override
   String? get notes;
   @override
+  @JsonKey(readValue: _readCreatedAt)
   DateTime get createdAt;
+  @override
+  @JsonKey(readValue: _readTourGuide, fromJson: _parseUser)
+  User? get tourGuide;
 
   /// Create a copy of Booking
   /// with the given fields replaced by the non-null parameter values.

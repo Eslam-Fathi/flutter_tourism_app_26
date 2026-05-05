@@ -10,18 +10,15 @@ _$TourismServiceImpl _$$TourismServiceImplFromJson(Map<String, dynamic> json) =>
     _$TourismServiceImpl(
       id: json['_id'] as String,
       title: json['title'] as String,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      price: json['price'] == null ? 0.0 : _parsePrice(json['price']),
       location: json['location'] as String,
       category: json['category'] as String,
       company: _parseId(json['company']),
       description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
+      images: json['images'] == null ? const [] : _parseImages(json['images']),
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       reviewsCount: (json['reviewsCount'] as num?)?.toInt() ?? 0,
+      tourGuide: _parseUser(_readTourGuide(json, 'tourGuide')),
     );
 
 Map<String, dynamic> _$$TourismServiceImplToJson(
@@ -37,6 +34,7 @@ Map<String, dynamic> _$$TourismServiceImplToJson(
   'images': instance.images,
   'rating': instance.rating,
   'reviewsCount': instance.reviewsCount,
+  'tourGuide': instance.tourGuide,
 };
 
 _$ServiceResponseImpl _$$ServiceResponseImplFromJson(

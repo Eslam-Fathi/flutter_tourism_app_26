@@ -14,6 +14,7 @@
   "tripPlans": "خطط الرحلات",
 
   "searchDestinations": "ابحث عن وجهات...",
+  "search": "بحث",
   "browseByCategory": "تصفح حسب الفئة",
   "popularThisWeek": "شائع هذا الأسبوع",
   "bookNow": "احجز الآن",
@@ -62,6 +63,7 @@
   "categoryCulture": "ثقافة",
   "categoryCity": "مدينة",
   "categoryAdventure": "مغامرة",
-  "categoryFood": "طعام"
-
+  "categoryFood": "طعام",
+  "aiGuide": "اسأل المساعد الذكي",
+  "askAI": "اسأل عن مصر..."
 }

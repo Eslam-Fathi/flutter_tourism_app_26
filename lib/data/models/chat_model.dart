@@ -10,9 +10,16 @@ class ChatMessage with _$ChatMessage {
     @JsonKey(name: '_id') required String id,
     required String booking,
     required String content,
-    required User sender,
+    @JsonKey(fromJson: _senderFromJson) required User sender,
     DateTime? createdAt,
   }) = _ChatMessage;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => _$ChatMessageFromJson(json);
+}
+
+User _senderFromJson(dynamic json) {
+  if (json is String) {
+    return User(id: json, name: 'User');
+  }
+  return User.fromJson(json as Map<String, dynamic>);
 }
