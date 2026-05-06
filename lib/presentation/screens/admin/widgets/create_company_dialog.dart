@@ -148,10 +148,11 @@ class _CreateCompanyDialogState extends ConsumerState<CreateCompanyDialog> {
                       const SizedBox(height: 16),
                       _buildCategoryDropdown(),
                       const SizedBox(height: 16),
-                      _buildTextField(
+                       _buildTextField(
                         'Description (Optional)',
                         _descController,
                         maxLines: 3,
+                        maxLength: 1000,
                       ),
                       const SizedBox(height: 32),
                       Row(
@@ -243,16 +244,19 @@ class _CreateCompanyDialogState extends ConsumerState<CreateCompanyDialog> {
     int maxLines = 1,
     bool obscureText = false,
     bool isEmail = false,
+    int? maxLength,
   }) {
     return TextField(
       controller: controller,
       maxLines: obscureText ? 1 : maxLines,
+      maxLength: maxLength ?? 100,
       obscureText: obscureText,
       keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white38),
+        counterStyle: const TextStyle(color: Colors.white54, fontSize: 10),
         filled: true,
         fillColor: Colors.white12,
         border: OutlineInputBorder(

@@ -1,11 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../data/models/service_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../providers/interaction/interaction_provider.dart';
 
-class ServiceCard extends StatefulWidget {
+class ServiceCard extends ConsumerStatefulWidget {
   final TourismService service;
   final VoidCallback onTap;
 
@@ -16,14 +18,13 @@ class ServiceCard extends StatefulWidget {
   });
 
   @override
-  State<ServiceCard> createState() => _ServiceCardState();
+  ConsumerState<ServiceCard> createState() => _ServiceCardState();
 }
 
-class _ServiceCardState extends State<ServiceCard>
+class _ServiceCardState extends ConsumerState<ServiceCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _scaleController;
   late final Animation<double> _scaleAnim;
-  bool _isFavorited = false;
 
   String get _imageUrl =>
       widget.service.images.isNotEmpty ? widget.service.images.first : '';
@@ -49,6 +50,11 @@ class _ServiceCardState extends State<ServiceCard>
 
   @override
   Widget build(BuildContext context) {
+    final isFavorited = ref.watch(favoriteNotifierProvider).maybeWhen(
+          data: (favs) => favs.any((f) => f.service.id == widget.service.id),
+          orElse: () => false,
+        );
+
     return GestureDetector(
       onTapDown: (_) => _scaleController.reverse(),
       onTapUp: (_) {
@@ -126,7 +132,9 @@ class _ServiceCardState extends State<ServiceCard>
                     top: 14,
                     right: 14,
                     child: GestureDetector(
-                      onTap: () => setState(() => _isFavorited = !_isFavorited),
+                      onTap: () {
+                        ref.read(favoriteNotifierProvider.notifier).toggleFavorite(widget.service.id);
+                      },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: BackdropFilter(
@@ -139,10 +147,10 @@ class _ServiceCardState extends State<ServiceCard>
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              _isFavorited
+                              isFavorited
                                   ? Icons.favorite
                                   : Icons.favorite_border,
-                              color: _isFavorited
+                              color: isFavorited
                                   ? Colors.redAccent
                                   : AppColors.textBody,
                               size: 18,

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tourism_app_26/core/extensions/l10n_extension.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
 import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_tourism_app_26/presentation/providers/service/service_pr
 import 'package:flutter_tourism_app_26/presentation/widgets/service_card.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/service/service_details_screen.dart';
 import '../../providers/notification_provider.dart';
+
 import '../profile/notifications_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
@@ -38,8 +40,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     if (Responsive.isDesktop(context)) {
       showDialog(
         context: context,
-        builder: (context) =>
-            const AlertDialog(content: Text('Desktop filters coming soon')),
+        builder: (context) => AlertDialog(
+          content: Text(context.l10n.desktopFiltersSoon),
+        ), // Localized dialog text
       );
     } else {
       showModalBottomSheet(
@@ -167,7 +170,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Find your next unforgettable experience',
+                              context
+                                  .l10n
+                                  .findNextExperience, // Localized tagline
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 15,
@@ -465,43 +470,27 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
                 servicesAsync.when(
                   data: (services) {
-                    final columns = isDesktop
-                        ? 2
-                        : (Responsive.isTablet(context) ? 2 : 1);
+                    final columns = isDesktop ? 3 : 2;
                     return SliverPadding(
                       padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
-                      sliver: columns > 1
-                          ? SliverGrid(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 20,
-                                    crossAxisSpacing: 20,
-                                    mainAxisExtent: 380,
-                                  ),
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => ServiceCard(
-                                  service: services[index],
-                                  onTap: () => ServiceDetailsScreen.show(
-                                    context,
-                                    services[index],
-                                  ),
-                                ),
-                                childCount: services.length,
-                              ),
-                            )
-                          : SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => ServiceCard(
-                                  service: services[index],
-                                  onTap: () => ServiceDetailsScreen.show(
-                                    context,
-                                    services[index],
-                                  ),
-                                ),
-                                childCount: services.length,
-                              ),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: columns,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          mainAxisExtent: isDesktop ? 400 : 380,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => ServiceCard(
+                            service: services[index],
+                            onTap: () => ServiceDetailsScreen.show(
+                              context,
+                              services[index],
                             ),
+                          ),
+                          childCount: services.length,
+                        ),
+                      ),
                     );
                   },
                   loading: () => SliverToBoxAdapter(
@@ -519,16 +508,18 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Could not load services',
-                            style: TextStyle(color: Colors.white70),
+                            context
+                                .l10n
+                                .couldNotLoadServices, // Localized error message
+                            style: const TextStyle(color: Colors.white70),
                           ),
                           TextButton(
                             onPressed: () => ref
                                 .read(serviceNotifierProvider.notifier)
                                 .refresh(),
-                            child: const Text(
-                              'Retry',
-                              style: TextStyle(color: Colors.white),
+                            child: Text(
+                              context.l10n.retry, // Localized retry button
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         ],
@@ -556,16 +547,16 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
   double _priceRange = 1000;
   String _selectedCategory = 'All';
 
-  final List<Map<String, String>> _categories = [
-    {'label': 'All', 'value': 'All'},
-    {'label': 'Hotels', 'value': 'Hotel'},
-    {'label': 'Apartments', 'value': 'RealEstate'},
-    {'label': 'Tours', 'value': 'Tours'},
-    {'label': 'Cars', 'value': 'Cars'},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> categories = [
+      {'label': context.l10n.all, 'value': 'All'},
+      {'label': context.l10n.hotels, 'value': 'Hotel'},
+      {'label': context.l10n.apartments, 'value': 'RealEstate'},
+      {'label': context.l10n.tours, 'value': 'Tours'},
+      {'label': context.l10n.cars, 'value': 'Cars'},
+    ];
+
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
@@ -601,9 +592,9 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Category',
-            style: TextStyle(
+          Text(
+            context.l10n.category, // Localized label
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -614,10 +605,10 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
             height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _categories.length,
+              itemCount: categories.length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final cat = _categories[index];
+                final cat = categories[index];
                 final isSelected = _selectedCategory == cat['value'];
                 return ChoiceChip(
                   label: Text(cat['label']!),

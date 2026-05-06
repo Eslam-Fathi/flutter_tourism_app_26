@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tourism_app_26/data/models/user_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/models/booking_model.dart';
 import '../../../data/models/chat_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../providers/chat/chat_provider.dart';
 import '../../providers/auth/auth_provider.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final Booking booking;
+  final String? conversationId;
+  final User? partner;
 
-  const ChatScreen({super.key, required this.booking});
+  const ChatScreen({
+    super.key,
+    required this.booking,
+    this.conversationId,
+    this.partner,
+  });
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -37,10 +46,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (text.isEmpty) return;
 
     // Send the message using the provider
-    ref.read(chatNotifierProvider(widget.booking.id).notifier).sendMessage(text);
-    
+    final id = widget.conversationId ?? widget.booking.id;
+    ref.read(chatNotifierProvider(id).notifier).sendMessage(text);
+
     _messageController.clear();
-    
+
     // Scroll to bottom optionally.
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -53,16 +63,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatState = ref.watch(chatNotifierProvider(widget.booking.id));
+    final id = widget.conversationId ?? widget.booking.id;
+    final chatState = ref.watch(chatNotifierProvider(id));
     final user = ref.watch(authNotifierProvider).user;
     final service = widget.booking.tourismService;
 
-    final chatPartner = (widget.booking.user?.id == user?.id) 
-        ? widget.booking.tourGuide 
-        : widget.booking.user;
+    // Determine chat partner
+    final bool isManagerChat = widget.conversationId != null && widget.conversationId == service.managerId;
     
-    final partnerName = chatPartner?.name ?? service.title;
-    final partnerAvatar = chatPartner?.avatar;
+    final User? chatPartner =
+        widget.partner ??
+        ((widget.booking.user?.id == user?.id)
+            ? widget.booking.tourGuide
+            : widget.booking.user);
+
+    final partnerName = isManagerChat ? '${service.companyName} Manager' : (chatPartner?.name ?? service.title);
+    final partnerAvatar = isManagerChat ? service.companyLogo : chatPartner?.avatar;
 
     List<ChatMessage> messages = chatState.valueOrNull ?? [];
     final displayMessages = messages.reversed.toList();
@@ -75,13 +91,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-              backgroundImage: (partnerAvatar != null && partnerAvatar.isNotEmpty)
+              backgroundImage:
+                  (partnerAvatar != null && partnerAvatar.isNotEmpty)
                   ? NetworkImage(partnerAvatar)
                   : null,
-              child: (partnerAvatar == null || partnerAvatar.isEmpty) ? Text(
-                partnerName.substring(0, 1).toUpperCase(),
-                style: const TextStyle(fontSize: 14, color: AppColors.primary),
-              ) : null,
+              child: (partnerAvatar == null || partnerAvatar.isEmpty)
+                  ? Text(
+                      partnerName.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -90,7 +112,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 children: [
                   Text(
                     partnerName,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Text(
@@ -116,12 +142,97 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // ── Booking Context Header ──────────────────────────────────────
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      image: service.images.isNotEmpty
+                          ? DecorationImage(
+                              image: NetworkImage(service.images.first),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                    child: service.images.isEmpty
+                        ? const Icon(
+                            LucideIcons.image,
+                            size: 16,
+                            color: Colors.white24,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${service.title} • ${service.companyName}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '${widget.booking.dates.startDate.day}/${widget.booking.dates.startDate.month} - ${widget.booking.dates.endDate.day}/${widget.booking.dates.endDate.month}',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.booking.status.toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             Expanded(
               child: chatState.isLoading && messages.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 20,
+                      ),
                       itemCount: displayMessages.length,
                       reverse: true,
                       itemBuilder: (context, index) {
@@ -147,7 +258,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isMe ? AppColors.primary : Theme.of(context).colorScheme.surface,
+          color: isMe
+              ? AppColors.primary
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
             topRight: const Radius.circular(20),
@@ -169,7 +282,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Text(
               msg.content,
               style: TextStyle(
-                color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                color: isMe
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
                 fontSize: 15,
                 height: 1.3,
               ),
@@ -232,7 +347,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   decoration: const InputDecoration(
                     hintText: 'Type your message...',
                     hintStyle: TextStyle(color: AppColors.textMuted),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -252,7 +370,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              icon: const Icon(
+                Icons.send_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               onPressed: _sendMessage,
             ),
           ),

@@ -10,9 +10,11 @@ import '../screens/bookings/my_bookings_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/chat/conversations_screen.dart';
 import '../screens/tour_guide/tour_guide_dashboard_screen.dart';
+import '../screens/tour_guide/tour_guide_schedule_screen.dart';
 import '../../core/network/socket_service.dart';
 import '../providers/base/base_providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/extensions/l10n_extension.dart'; // Import l10n extension
 
 
 // ── Nav destination model ─────────────────────────────────────────────────
@@ -28,33 +30,80 @@ class _NavDest {
 }
 
 // ── Main Wrapper ──────────────────────────────────────────────────────────
-class MainWrapper extends ConsumerStatefulWidget {
+class MainWrapper extends ConsumerWidget {
   const MainWrapper({super.key});
 
   @override
-  ConsumerState<MainWrapper> createState() => _MainWrapperState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(mainNavNotifierProvider);
+    final user = ref.watch(authNotifierProvider).user;
+    final role = user?.role ?? 'User';
+    final destinations = _getDestinations(context, role);
+    final screens = _getScreens(role);
+    
+    // ── Global Socket Connection Logic ──────────────────────────────
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (next.user != null) {
+        ref.read(tokenStorageProvider).getToken().then((token) {
+          if (token != null) {
+            ref.read(socketServiceProvider.notifier).connect(token, 'https://se-yaha.vercel.app');
+          }
+        });
+      }
+    });
 
-class _MainWrapperState extends ConsumerState<MainWrapper> {
-  int _currentIndex = 0;
+    final isDesktop = Responsive.isDesktop(context);
 
-  void _onNavTap(int index) {
-    setState(() => _currentIndex = index);
+    // ── Desktop / Web layout ──────────────────────────────────────────
+    if (isDesktop) {
+      return Scaffold(
+        body: Row(
+          children: [
+            _DesktopNavRail(
+              currentIndex: currentIndex,
+              onTap: (index) => ref.read(mainNavNotifierProvider.notifier).setIndex(index),
+              destinations: destinations,
+            ),
+            const VerticalDivider(width: 1, thickness: 1),
+            Expanded(
+              child: IndexedStack(
+                index: currentIndex,
+                children: screens,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Scaffold(
+      extendBody: true,
+      backgroundColor: AppColors.backgroundDark,
+      body: IndexedStack(
+        index: currentIndex,
+        children: screens,
+      ),
+      bottomNavigationBar: _BottomNavBar(
+        currentIndex: currentIndex,
+        onTap: (index) => ref.read(mainNavNotifierProvider.notifier).setIndex(index),
+        destinations: destinations,
+      ),
+    );
   }
 
   List<_NavDest> _getDestinations(BuildContext context, String role) {
     final l10n = AppLocalizations.of(context)!;
     if (role == 'TourGuide') {
       return [
-        const _NavDest(
+        _NavDest(
           icon: Icons.dashboard_outlined,
           activeIcon: Icons.dashboard_rounded,
-          label: 'Dashboard',
+          label: context.l10n.dashboard, // Localized dashboard
         ),
-        const _NavDest(
+        _NavDest(
           icon: Icons.calendar_month_outlined,
           activeIcon: Icons.calendar_month_rounded,
-          label: 'Schedule',
+          label: context.l10n.schedule, // Localized schedule
         ),
         _NavDest(
           icon: Icons.chat_bubble_outline,
@@ -82,7 +131,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
     if (role == 'TourGuide') {
       return [
         const TourGuideDashboardScreen(),
-        const MyBookingsScreen(), // Shows assignments for guides
+        const TourGuideScheduleScreen(),
         const ConversationsScreen(),
         const ProfileScreen(),
       ];
@@ -95,72 +144,6 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
       const ConversationsScreen(),
       const ProfileScreen(),
     ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final user = ref.watch(authNotifierProvider).user;
-    final role = user?.role ?? 'User';
-    final destinations = _getDestinations(context, role);
-    final screens = _getScreens(role);
-    
-    // ── Global Socket Connection Logic ──────────────────────────────
-    ref.listen(authNotifierProvider, (previous, next) {
-      if (next.user != null) {
-        ref.read(tokenStorageProvider).getToken().then((token) {
-          if (token != null) {
-            ref.read(socketServiceProvider.notifier).connect(token, 'https://se-yaha.vercel.app');
-          }
-        });
-      }
-    });
-
-    final isDesktop = Responsive.isDesktop(context);
-
-    // Ensure index is within bounds after role switch
-    if (_currentIndex >= screens.length) {
-      _currentIndex = 0;
-    }
-
-    // ── Desktop / Web layout ──────────────────────────────────────────
-    if (isDesktop) {
-      return Scaffold(
-        body: Row(
-          children: [
-            // Left navigation rail
-            _DesktopNavRail(
-              currentIndex: _currentIndex,
-              onTap: _onNavTap,
-              destinations: destinations,
-            ),
-            // A thin vertical divider
-            const VerticalDivider(width: 1, thickness: 1),
-            // Main content
-            Expanded(
-              child: IndexedStack(
-                index: _currentIndex,
-                children: screens,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // ── Mobile / Tablet layout (unified) ─────────────────────────
-    return Scaffold(
-      extendBody: true,
-      backgroundColor: AppColors.backgroundDark,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      bottomNavigationBar: _BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onNavTap,
-        destinations: destinations,
-      ),
-    );
   }
 }
 
@@ -304,7 +287,7 @@ class _DesktopNavRail extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              user?.name ?? 'Guest',
+                              user?.name ?? context.l10n.guest, // Localized guest fallback
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -313,7 +296,7 @@ class _DesktopNavRail extends ConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              user?.role ?? 'Guest',
+                              user?.role ?? context.l10n.guest, // Localized role fallback
                               style: const TextStyle(
                                   color: Colors.white38, fontSize: 11),
                             ),
@@ -326,7 +309,7 @@ class _DesktopNavRail extends ConsumerWidget {
                         onPressed: () => ref
                             .read(authNotifierProvider.notifier)
                             .logout(),
-                        tooltip: 'Log out',
+                        tooltip: context.l10n.logOut, // Localized tooltip
                       ),
                     ],
                   ),

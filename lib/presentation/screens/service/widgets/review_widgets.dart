@@ -239,6 +239,7 @@ class _AddReviewSheetState extends ConsumerState<AddReviewSheet> {
           TextField(
             controller: _commentController,
             maxLines: 4,
+            maxLength: 1000,
             decoration: InputDecoration(
               hintText: 'Write your review here...',
               hintStyle: const TextStyle(color: AppColors.textMuted),

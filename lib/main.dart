@@ -7,6 +7,7 @@ import 'presentation/providers/auth/auth_provider.dart';
 import 'presentation/providers/theme/theme_provider.dart';
 import 'presentation/providers/theme/locale_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
+import 'presentation/screens/auth/splash_screen.dart';
 import 'presentation/screens/auth/onboarding_screen.dart';
 import 'presentation/screens/main_wrapper.dart';
 import 'presentation/screens/admin/admin_main_wrapper.dart';
@@ -52,7 +53,7 @@ class MyApp extends ConsumerWidget {
   Widget _getHome(AuthState state) {
     switch (state.status) {
       case AuthStatus.loading:
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        return const SplashScreen();
       case AuthStatus.authenticated:
         if (state.user?.role.toLowerCase() == 'admin') {
           return const AdminMainWrapper();

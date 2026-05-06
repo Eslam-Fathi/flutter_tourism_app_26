@@ -14,28 +14,7 @@ class BookingNotifier extends _$BookingNotifier {
 
   Future<List<Booking>> _fetchMyBookings() async {
     final repo = ref.read(bookingRepositoryProvider);
-    final user = ref.read(authNotifierProvider).user;
-
-    // Fetch regular traveler bookings
-    final travelerBookings = await repo.getMyBookings();
-
-    // If user is a guide, fetch all company bookings and filter by their ID
-    if (user?.role == 'TourGuide') {
-      try {
-        final allBookings = await repo.getCompanyBookings();
-        final assignedBookings = allBookings.where((b) => b.tourGuide?.id == user?.id).toList();
-        
-        // Merge lists and remove duplicates by ID
-        final combined = [...travelerBookings, ...assignedBookings];
-        final seenIds = <String>{};
-        return combined.where((b) => seenIds.add(b.id)).toList();
-      } catch (e) {
-        // Fallback to traveler bookings if fetching all fails
-        return travelerBookings;
-      }
-    }
-
-    return travelerBookings;
+    return await repo.getMyBookings();
   }
 
   Future<void> refresh() async {
@@ -71,4 +50,9 @@ class BookingNotifier extends _$BookingNotifier {
 @riverpod
 Future<List<Booking>> companyBookings(CompanyBookingsRef ref) {
   return ref.read(bookingRepositoryProvider).getCompanyBookings();
+}
+
+@riverpod
+Future<List<Booking>> allBookings(AllBookingsRef ref) {
+  return ref.read(bookingRepositoryProvider).getAllBookings();
 }

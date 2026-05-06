@@ -1,10 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../data/models/service_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../providers/interaction/interaction_provider.dart';
 
-class TrendingCard extends StatefulWidget {
+class TrendingCard extends ConsumerWidget {
   final TourismService service;
   final VoidCallback onTap;
 
@@ -14,20 +16,18 @@ class TrendingCard extends StatefulWidget {
     required this.onTap,
   });
 
-  @override
-  State<TrendingCard> createState() => _TrendingCardState();
-}
-
-class _TrendingCardState extends State<TrendingCard> {
-  bool _isFavorited = false;
-
   String get _imageUrl =>
-      widget.service.images.isNotEmpty ? widget.service.images.first : '';
+      service.images.isNotEmpty ? service.images.first : '';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFavorited = ref.watch(favoriteNotifierProvider).maybeWhen(
+          data: (favs) => favs.any((f) => f.service.id == service.id),
+          orElse: () => false,
+        );
+
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         width: 220,
         margin: const EdgeInsets.only(right: 16),
@@ -35,7 +35,7 @@ class _TrendingCardState extends State<TrendingCard> {
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.15),
+              color: AppColors.primary.withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -48,7 +48,7 @@ class _TrendingCardState extends State<TrendingCard> {
             children: [
               // Background image
               Hero(
-                tag: 'trending-${widget.service.id}',
+                tag: 'trending-${service.id}',
                 child: _imageUrl.isEmpty
                     ? Image.asset('assets/images/bali.png', fit: BoxFit.cover)
                     : CachedNetworkImage(
@@ -72,7 +72,9 @@ class _TrendingCardState extends State<TrendingCard> {
                 top: 12,
                 right: 12,
                 child: GestureDetector(
-                  onTap: () => setState(() => _isFavorited = !_isFavorited),
+                  onTap: () {
+                    ref.read(favoriteNotifierProvider.notifier).toggleFavorite(service.id);
+                  },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: BackdropFilter(
@@ -80,15 +82,15 @@ class _TrendingCardState extends State<TrendingCard> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Icon(
-                          _isFavorited ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorited ? Colors.redAccent : Colors.white,
+                          isFavorited ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorited ? Colors.redAccent : Colors.white,
                           size: 16,
                         ),
                       ),
@@ -104,11 +106,11 @@ class _TrendingCardState extends State<TrendingCard> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _categoryColor(widget.service.category),
+                    color: _categoryColor(service.category),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    widget.service.category.toUpperCase(),
+                    service.category.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 9,
@@ -131,9 +133,9 @@ class _TrendingCardState extends State<TrendingCard> {
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.35),
+                        color: Colors.black.withValues(alpha: 0.35),
                         border: Border(
-                          top: BorderSide(color: Colors.white.withOpacity(0.15)),
+                          top: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
                         ),
                       ),
                       child: Column(
@@ -141,7 +143,7 @@ class _TrendingCardState extends State<TrendingCard> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            widget.service.title,
+                            service.title,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -158,7 +160,7 @@ class _TrendingCardState extends State<TrendingCard> {
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
-                                  widget.service.location,
+                                  service.location,
                                   style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 11,
@@ -174,7 +176,7 @@ class _TrendingCardState extends State<TrendingCard> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '\$${widget.service.price.toInt()}',
+                                '\$${service.price.toInt()}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w900,
@@ -187,7 +189,7 @@ class _TrendingCardState extends State<TrendingCard> {
                                       size: 13, color: Colors.amber),
                                   const SizedBox(width: 3),
                                   Text(
-                                    widget.service.rating.toStringAsFixed(1),
+                                    service.rating.toStringAsFixed(1),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,

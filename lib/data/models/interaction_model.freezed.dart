@@ -25,6 +25,7 @@ mixin _$Review {
   String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'service')
   String get serviceId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseUser)
   User get user => throw _privateConstructorUsedError;
   int get rating => throw _privateConstructorUsedError;
   String get comment => throw _privateConstructorUsedError;
@@ -47,7 +48,7 @@ abstract class $ReviewCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String id,
     @JsonKey(name: 'service') String serviceId,
-    User user,
+    @JsonKey(fromJson: _parseUser) User user,
     int rating,
     String comment,
     DateTime? createdAt,
@@ -131,7 +132,7 @@ abstract class _$$ReviewImplCopyWith<$Res> implements $ReviewCopyWith<$Res> {
   $Res call({
     @JsonKey(name: '_id') String id,
     @JsonKey(name: 'service') String serviceId,
-    User user,
+    @JsonKey(fromJson: _parseUser) User user,
     int rating,
     String comment,
     DateTime? createdAt,
@@ -199,7 +200,7 @@ class _$ReviewImpl implements _Review {
   const _$ReviewImpl({
     @JsonKey(name: '_id') required this.id,
     @JsonKey(name: 'service') required this.serviceId,
-    required this.user,
+    @JsonKey(fromJson: _parseUser) required this.user,
     required this.rating,
     required this.comment,
     this.createdAt,
@@ -215,6 +216,7 @@ class _$ReviewImpl implements _Review {
   @JsonKey(name: 'service')
   final String serviceId;
   @override
+  @JsonKey(fromJson: _parseUser)
   final User user;
   @override
   final int rating;
@@ -266,7 +268,7 @@ abstract class _Review implements Review {
   const factory _Review({
     @JsonKey(name: '_id') required final String id,
     @JsonKey(name: 'service') required final String serviceId,
-    required final User user,
+    @JsonKey(fromJson: _parseUser) required final User user,
     required final int rating,
     required final String comment,
     final DateTime? createdAt,
@@ -281,6 +283,7 @@ abstract class _Review implements Review {
   @JsonKey(name: 'service')
   String get serviceId;
   @override
+  @JsonKey(fromJson: _parseUser)
   User get user;
   @override
   int get rating;
@@ -305,6 +308,7 @@ Favorite _$FavoriteFromJson(Map<String, dynamic> json) {
 mixin _$Favorite {
   @JsonKey(name: '_id')
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseService)
   TourismService get service => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -325,7 +329,7 @@ abstract class $FavoriteCopyWith<$Res> {
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    TourismService service,
+    @JsonKey(fromJson: _parseService) TourismService service,
     DateTime? createdAt,
   });
 
@@ -392,7 +396,7 @@ abstract class _$$FavoriteImplCopyWith<$Res>
   @useResult
   $Res call({
     @JsonKey(name: '_id') String id,
-    TourismService service,
+    @JsonKey(fromJson: _parseService) TourismService service,
     DateTime? createdAt,
   });
 
@@ -442,7 +446,7 @@ class __$$FavoriteImplCopyWithImpl<$Res>
 class _$FavoriteImpl implements _Favorite {
   const _$FavoriteImpl({
     @JsonKey(name: '_id') required this.id,
-    required this.service,
+    @JsonKey(fromJson: _parseService) required this.service,
     this.createdAt,
   });
 
@@ -453,6 +457,7 @@ class _$FavoriteImpl implements _Favorite {
   @JsonKey(name: '_id')
   final String id;
   @override
+  @JsonKey(fromJson: _parseService)
   final TourismService service;
   @override
   final DateTime? createdAt;
@@ -494,7 +499,7 @@ class _$FavoriteImpl implements _Favorite {
 abstract class _Favorite implements Favorite {
   const factory _Favorite({
     @JsonKey(name: '_id') required final String id,
-    required final TourismService service,
+    @JsonKey(fromJson: _parseService) required final TourismService service,
     final DateTime? createdAt,
   }) = _$FavoriteImpl;
 
@@ -505,6 +510,7 @@ abstract class _Favorite implements Favorite {
   @JsonKey(name: '_id')
   String get id;
   @override
+  @JsonKey(fromJson: _parseService)
   TourismService get service;
   @override
   DateTime? get createdAt;

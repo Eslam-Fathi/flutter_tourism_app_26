@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/base/base_providers.dart';
+import 'package:flutter_tourism_app_26/presentation/screens/explore/explore_screen.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
 import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/core/widgets/section_header.dart';
 import 'package:flutter_tourism_app_26/core/widgets/shimmer_loader.dart';
+import 'package:flutter_tourism_app_26/core/extensions/l10n_extension.dart'; // Import l10n extension
 
 import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
@@ -38,25 +41,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-
   void _showGuestPopup(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sign In Required'),
-        content: const Text(
-          'You need to create an account or sign in to perform this action.',
+        title: Text(context.l10n.signInRequired), // Localized dialog title
+        content: Text(
+          context.l10n.signInRequiredMsg, // Localized dialog message
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Maybe Later'),
+            child: Text(context.l10n.maybeLater), // Localized button
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(minimumSize: const Size(120, 44)),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Sign In'),
+            child: Text(context.l10n.signIn), // Localized button
           ),
         ],
       ),
@@ -72,13 +74,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final List<Map<String, dynamic>> categories = [
       {'label': l10n.categoryAll, 'icon': Icons.apps_rounded, 'key': 'All'},
-      {'label': l10n.categoryHotels, 'icon': Icons.hotel_rounded, 'key': 'Hotel'},
-      {'label': l10n.categoryApartments, 'icon': Icons.apartment_rounded, 'key': 'RealEstate'},
+      {
+        'label': l10n.categoryHotels,
+        'icon': Icons.hotel_rounded,
+        'key': 'Hotel',
+      },
+      {
+        'label': l10n.categoryApartments,
+        'icon': Icons.apartment_rounded,
+        'key': 'RealEstate',
+      },
       {'label': l10n.categoryTours, 'icon': Icons.map_rounded, 'key': 'Tours'},
-      {'label': l10n.categoryCars, 'icon': Icons.directions_car_rounded, 'key': 'Cars'},
+      {
+        'label': l10n.categoryCars,
+        'icon': Icons.directions_car_rounded,
+        'key': 'Cars',
+      },
     ];
-
-
 
     final hp = Responsive.horizontalPadding(context);
     final maxW = Responsive.contentMaxWidth(context);
@@ -123,7 +135,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onChanged: (val) => setState(() => _searchQuery = val),
                     onFilterTap: () => _showFilterSheet(context),
                   ),
-
                 ),
 
                 // leading removed to unify navigation
@@ -138,11 +149,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => const NotificationsScreen(),
+                              ),
                             );
                           },
                         ),
-                        if (ref.watch(notificationNotifierProvider.notifier).unreadCount > 0)
+                        if (ref
+                                .watch(notificationNotifierProvider.notifier)
+                                .unreadCount >
+                            0)
                           Positioned(
                             top: 8,
                             right: 8,
@@ -330,7 +346,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: SectionHeader(
                     title: l10n.trendingServices,
                     actionLabel: l10n.seeAll,
-                    onAction: () {},
+                    onAction: () {
+                      // Switch to the Explore tab (index 1) in the MainWrapper
+                      ref.read(mainNavNotifierProvider.notifier).setIndex(1);
+                    },
                   ),
                 ),
               ),
@@ -343,14 +362,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   hp: hp,
                   child: servicesAsync.when(
                     data: (services) {
-                      // Filter logic
                       final filteredServices = services.where((s) {
-                        final matchesCategory = _selectedCategoryIndex == 0 ||
-                            s.category.toLowerCase() == categories[_selectedCategoryIndex]['key'].toString().toLowerCase();
-                        final matchesSearch = _searchQuery.isEmpty ||
-
-                            s.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                            s.location.toLowerCase().contains(_searchQuery.toLowerCase());
+                        final matchesCategory =
+                            _selectedCategoryIndex == 0 ||
+                            s.category.toLowerCase() ==
+                                categories[_selectedCategoryIndex]['key']
+                                    .toString()
+                                    .toLowerCase();
+                        final matchesSearch =
+                            _searchQuery.isEmpty ||
+                            s.title.toLowerCase().contains(
+                              _searchQuery.toLowerCase(),
+                            ) ||
+                            s.location.toLowerCase().contains(
+                              _searchQuery.toLowerCase(),
+                            );
                         return matchesCategory && matchesSearch;
                       }).toList();
 
@@ -360,60 +386,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const SizedBox(height: 40),
-                              Icon(Icons.search_off, size: 48, color: Colors.white24),
+                              const Icon(
+                                Icons.search_off,
+                                size: 48,
+                                color: Colors.white24,
+                              ),
                               const SizedBox(height: 16),
                               Text(
                                 l10n.noResults,
-                                style: const TextStyle(color: Colors.white54, fontSize: 16),
+                                style: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 16,
+                                ),
                               ),
                             ],
                           ),
                         );
                       }
-                      
-                      if (isDesktop) {
-                        return Wrap(
-                          spacing: 24,
-                          runSpacing: 24,
-                          children: filteredServices.map((s) {
-                            return SizedBox(
-                              width: trendingCardWidth,
-                              height: trendingHeight,
-                              child: TrendingCard(
-                                service: s,
-                                onTap: () => _handleServiceTap(context, s, isGuest),
+
+                      return SizedBox(
+                        height: trendingHeight,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          clipBehavior: Clip.none,
+                          itemCount: filteredServices.length,
+                          itemBuilder: (context, index) {
+                            final s = filteredServices[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: SizedBox(
+                                width: trendingCardWidth,
+                                child: TrendingCard(
+                                  service: s,
+                                  onTap: () =>
+                                      _handleServiceTap(context, s, isGuest),
+                                ),
                               ),
-
                             );
-                          }).toList(),
-                        );
-                      } else {
-                        return SizedBox(
-                          height: trendingHeight,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            clipBehavior: Clip.none,
-                            padding: EdgeInsets.symmetric(horizontal: hp),
-                            itemCount: filteredServices.length,
-                            itemBuilder: (context, index) {
-                              final s = filteredServices[index];
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  right: index == filteredServices.length - 1 ? 0 : 20,
-                                ),
-                                child: SizedBox(
-                                  width: trendingCardWidth,
-                                  child: TrendingCard(
-                                    service: s,
-                                    onTap: () => _handleServiceTap(context, s, isGuest),
-                                  ),
-
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
+                          },
+                        ),
+                      );
                     },
 
                     loading: () => ShimmerCardList(
@@ -643,7 +655,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 /// Centers content with max width and symmetric horizontal padding.
@@ -703,11 +714,10 @@ class _SearchBar extends StatelessWidget {
     required this.onFilterTap,
   });
 
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Padding(
       // Vertical padding sits BELOW the hero image, inside the AppBar bottom slot
       padding: EdgeInsets.only(left: hp, right: hp, bottom: 12, top: 8),
@@ -749,7 +759,9 @@ class _SearchBar extends StatelessWidget {
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           fillColor: Colors.transparent,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -784,7 +796,6 @@ class _SearchBar extends StatelessWidget {
     );
   }
 }
-
 
 class _FeaturedBanner extends StatelessWidget {
   final bool isDesktop;

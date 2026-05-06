@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import '../../providers/admin/article_management_provider.dart';
 import 'widgets/create_article_dialog.dart';
 
@@ -21,9 +22,9 @@ class AdminArticlesScreen extends ConsumerWidget {
             slivers: [
               SliverAppBar(
                 backgroundColor: Colors.transparent,
-                title: const Text(
-                  'Historical Articles',
-                  style: TextStyle(
+                title: Text(
+                  AppLocalizations.of(context)!.historicalArticles,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -32,7 +33,8 @@ class AdminArticlesScreen extends ConsumerWidget {
                 floating: true,
                 actions: [
                   IconButton(
-                    onPressed: () => ref.read(articleNotifierProvider.notifier).refresh(),
+                    onPressed: () =>
+                        ref.read(articleNotifierProvider.notifier).refresh(),
                     icon: const Icon(Icons.refresh, color: Colors.white70),
                   ),
                 ],
@@ -42,17 +44,21 @@ class AdminArticlesScreen extends ConsumerWidget {
                 sliver: articlesAsync.when(
                   data: (articles) {
                     if (articles.isEmpty) {
-                      return const SliverToBoxAdapter(
+                      return SliverToBoxAdapter(
                         child: Center(
                           child: Padding(
-                            padding: EdgeInsets.all(64),
+                            padding: const EdgeInsets.all(64),
                             child: Column(
                               children: [
-                                Icon(Icons.history_edu, color: Colors.white24, size: 64),
-                                SizedBox(height: 16),
+                                const Icon(
+                                  Icons.history_edu,
+                                  color: Colors.white24,
+                                  size: 64,
+                                ),
+                                const SizedBox(height: 16),
                                 Text(
-                                  'No articles yet. Start by creating one!',
-                                  style: TextStyle(color: Colors.white38),
+                                  AppLocalizations.of(context)!.noArticlesYet,
+                                  style: const TextStyle(color: Colors.white38),
                                 ),
                               ],
                             ),
@@ -61,29 +67,32 @@ class AdminArticlesScreen extends ConsumerWidget {
                       );
                     }
                     return SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 400,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.2,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final article = articles[index];
-                          return _ArticleCard(article: article);
-                        },
-                        childCount: articles.length,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 400,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 1.2,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final article = articles[index];
+                        return _ArticleCard(article: article);
+                      }, childCount: articles.length),
                     );
                   },
                   loading: () => const SliverToBoxAdapter(
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                   error: (err, _) => SliverToBoxAdapter(
                     child: Center(
-                      child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent)),
+                      child: Text(
+                        '${AppLocalizations.of(context)!.error}: $err',
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
                     ),
                   ),
                 ),
@@ -102,7 +111,10 @@ class AdminArticlesScreen extends ConsumerWidget {
         },
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Add Article', style: TextStyle(color: Colors.white)),
+        label: Text(
+          AppLocalizations.of(context)!.addArticle,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
@@ -132,7 +144,8 @@ class _ArticleCard extends ConsumerWidget {
                   imageUrl: article.imageUrl,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(color: Colors.white10),
+                  placeholder: (context, url) =>
+                      Container(color: Colors.white10),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
@@ -154,12 +167,19 @@ class _ArticleCard extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on, color: AppColors.primary, size: 14),
+                        const Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: 14,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             article.location,
-                            style: const TextStyle(color: Colors.white54, fontSize: 12),
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -184,7 +204,11 @@ class _ArticleCard extends ConsumerWidget {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                child: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.redAccent,
+                  size: 18,
+                ),
               ),
             ),
           ),
@@ -198,19 +222,30 @@ class _ArticleCard extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surfaceDark,
-        title: const Text('Delete Article', style: TextStyle(color: Colors.white)),
-        content: const Text('Are you sure you want to delete this article?'),
+        title: Text(
+          AppLocalizations.of(context)!.deleteArticle,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(AppLocalizations.of(context)!.deleteArticleConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white38)),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(color: Colors.white38),
+            ),
           ),
           TextButton(
             onPressed: () {
-              ref.read(articleNotifierProvider.notifier).deleteArticle(article.id);
+              ref
+                  .read(articleNotifierProvider.notifier)
+                  .deleteArticle(article.id);
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            child: Text(
+              AppLocalizations.of(context)!.delete,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),

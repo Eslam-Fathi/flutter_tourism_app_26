@@ -63,7 +63,13 @@ class _AdminMainWrapperState extends ConsumerState<AdminMainWrapper> {
           children: [
             _DesktopAdminNavRail(currentIndex: _currentIndex, onTap: _onNavTap),
             const VerticalDivider(width: 1, thickness: 1, color: Colors.white12),
-            Expanded(child: IndexedStack(index: _currentIndex, children: screens)),
+            Expanded(child: IndexedStack(index: _currentIndex, children: [
+              const AdminDashboardOverview(key: ValueKey('admin_overview')),
+              const AdminUsersScreen(key: ValueKey('admin_users')),
+              const AdminCompaniesScreen(key: ValueKey('admin_companies')),
+              const AdminArticlesScreen(key: ValueKey('admin_articles')),
+              const ProfileScreen(key: ValueKey('admin_profile')),
+            ])),
           ],
         ),
       );
@@ -72,7 +78,13 @@ class _AdminMainWrapperState extends ConsumerState<AdminMainWrapper> {
     return Scaffold(
       extendBody: true,
       backgroundColor: AppColors.backgroundDark,
-      body: IndexedStack(index: _currentIndex, children: screens),
+      body: IndexedStack(index: _currentIndex, children: [
+        const AdminDashboardOverview(key: ValueKey('admin_overview')),
+        const AdminUsersScreen(key: ValueKey('admin_users')),
+        const AdminCompaniesScreen(key: ValueKey('admin_companies')),
+        const AdminArticlesScreen(key: ValueKey('admin_articles')),
+        const ProfileScreen(key: ValueKey('admin_profile')),
+      ]),
       bottomNavigationBar: _BottomAdminNavBar(currentIndex: _currentIndex, onTap: _onNavTap),
     );
   }
@@ -111,7 +123,7 @@ class _DesktopAdminNavRail extends ConsumerWidget {
                     child: const Icon(Icons.shield_outlined, color: Colors.white, size: 22),
                   ),
                   const SizedBox(width: 12),
-                  const Text('Admin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+                  Text(AppLocalizations.of(context)!.admin, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
                 ],
               ),
             ),
@@ -167,15 +179,15 @@ class _DesktopAdminNavRail extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(user?.name ?? 'Admin', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                            Text(user?.role ?? 'Role', style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                            Text(user?.name ?? AppLocalizations.of(context)!.admin, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            Text(user?.role ?? '', style: const TextStyle(color: Colors.white38, fontSize: 11)),
                           ],
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.logout, color: Colors.redAccent, size: 18),
                         onPressed: () => ref.read(authNotifierProvider.notifier).logout(),
-                        tooltip: 'Log out',
+                        tooltip: AppLocalizations.of(context)!.logOut,
                       ),
                     ],
                   ),

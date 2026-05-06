@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'user_model.dart';
+import 'company_model.dart';
 
 part 'service_model.freezed.dart';
 part 'service_model.g.dart';
@@ -15,13 +16,36 @@ class TourismService with _$TourismService {
     required String location,
     required String category,
     // company can be a plain String ID or a populated Company object from the backend
-    @JsonKey(fromJson: _parseId) required String company,
+    @JsonKey(readValue: _readCompany, fromJson: _parseCompany) required dynamic company,
     String? description,
     @JsonKey(fromJson: _parseImages) @Default([]) List<String> images,
     @Default(0.0) double rating,
     @Default(0) int reviewsCount,
     @JsonKey(readValue: _readTourGuide, fromJson: _parseUser) User? tourGuide,
   }) = _TourismService;
+
+  String? get companyId {
+    if (company == null) return null;
+    if (company is String) return company;
+    if (company is Company) return (company as Company).id;
+    return null;
+  }
+
+  String get companyName {
+    if (company == null) return 'N/A';
+    if (company is Company) return (company as Company).name;
+    return 'Company';
+  }
+
+  String? get companyLogo {
+    if (company is Company) return (company as Company).logo;
+    return null;
+  }
+
+  String? get managerId {
+    if (company is Company) return (company as Company).owner;
+    return null;
+  }
 
   /// Extracts the guide ID from the description if present via [[guideId:XYZ]]
   String? get assignedGuideId {
@@ -34,21 +58,27 @@ class TourismService with _$TourismService {
   /// Returns the description without the hidden metadata tag
   String get cleanDescription {
     if (description == null) return '';
-    return description!.replaceAll(RegExp(r'\s*\[\[guideId:.*?\]\]'), '').trim();
+    return description!
+        .replaceAll(RegExp(r'\s*\[\[guideId:.*?\]\]'), '')
+        .trim();
   }
 
-  factory TourismService.fromJson(Map<String, dynamic> json) => _$TourismServiceFromJson(json);
+  factory TourismService.fromJson(Map<String, dynamic> json) =>
+      _$TourismServiceFromJson(json);
 }
 
-Object? _readTourGuide(Map json, String key) => json['tourGuide'] ?? json['tour_guide'];
+Object? _readTourGuide(Map json, String key) =>
+    json['tourGuide'] ?? json['tour_guide'];
 
-/// Safely parses a field that can be either a plain String ID or a populated
-/// Mongoose object (Map). Returns the _id string in both cases.
-String _parseId(dynamic value) {
-  if (value == null) return '';
+Object? _readCompany(Map json, String key) =>
+    json['company'] ?? json['companyId'];
+
+/// Safely parses the company field.
+dynamic _parseCompany(dynamic value) {
+  if (value == null) return null;
   if (value is String) return value;
-  if (value is Map) return value['_id']?.toString() ?? value['id']?.toString() ?? '';
-  return value.toString();
+  if (value is Map) return Company.fromJson(Map<String, dynamic>.from(value));
+  return value;
 }
 
 /// Safely parses the price field which might be a String or Number.
@@ -84,5 +114,6 @@ class ServiceResponse with _$ServiceResponse {
     required List<TourismService> data,
   }) = _ServiceResponse;
 
-  factory ServiceResponse.fromJson(Map<String, dynamic> json) => _$ServiceResponseFromJson(json);
+  factory ServiceResponse.fromJson(Map<String, dynamic> json) =>
+      _$ServiceResponseFromJson(json);
 }

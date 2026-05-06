@@ -4,6 +4,7 @@ import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/responsive.dart';
 
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import '../../providers/company/company_provider.dart';
 import 'widgets/create_company_dialog.dart';
 
@@ -11,10 +12,12 @@ class AdminCompaniesScreen extends ConsumerStatefulWidget {
   const AdminCompaniesScreen({super.key});
 
   @override
-  ConsumerState<AdminCompaniesScreen> createState() => _AdminCompaniesScreenState();
+  ConsumerState<AdminCompaniesScreen> createState() =>
+      _AdminCompaniesScreenState();
 }
 
-class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> with SingleTickerProviderStateMixin {
+class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -37,23 +40,28 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> wit
       backgroundColor: AppColors.backgroundDark,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text(
-          'Company Management',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.companyManagement,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.redAccent,
           labelColor: Colors.redAccent,
           unselectedLabelColor: Colors.white54,
-          tabs: const [
-            Tab(text: 'Pending Requests'),
-            Tab(text: 'All Companies'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.pendingRequests),
+            Tab(text: AppLocalizations.of(context)!.allCompanies),
           ],
         ),
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(bottom: Responsive.isDesktop(context) ? 0 : 90),
+        padding: EdgeInsets.only(
+          bottom: Responsive.isDesktop(context) ? 0 : 90,
+        ),
         child: FloatingActionButton.extended(
           onPressed: () {
             showDialog(
@@ -63,9 +71,12 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> wit
           },
           backgroundColor: Colors.redAccent,
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            'Add Company',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          label: Text(
+            AppLocalizations.of(context)!.addCompany,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -73,12 +84,18 @@ class _AdminCompaniesScreenState extends ConsumerState<AdminCompaniesScreen> wit
         child: companiesState.when(
           data: (companies) {
             final pending = companies.where((c) => !c.approved).toList();
-            
+
             return TabBarView(
               controller: _tabController,
               children: [
-                _buildCompanyList(pending, 'No pending requests found.'),
-                _buildCompanyList(companies, 'No companies available.'),
+                _buildCompanyList(
+                  pending,
+                  AppLocalizations.of(context)!.noPendingRequestsFound,
+                ),
+                _buildCompanyList(
+                  companies,
+                  AppLocalizations.of(context)!.noCompaniesAvailable,
+                ),
               ],
             );
           },
@@ -178,7 +195,9 @@ class _CompanyAdminTile extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  isApproved ? 'Approved' : 'Pending',
+                  isApproved
+                      ? AppLocalizations.of(context)!.approved
+                      : AppLocalizations.of(context)!.pending,
                   style: TextStyle(
                     color: isApproved
                         ? Colors.greenAccent
@@ -206,9 +225,12 @@ class _CompanyAdminTile extends ConsumerWidget {
                     minimumSize: const Size(0, 28),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
-                    'Approve',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  child: Text(
+                    AppLocalizations.of(context)!.approve,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
             ],

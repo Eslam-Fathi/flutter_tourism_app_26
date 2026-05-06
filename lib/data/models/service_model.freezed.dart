@@ -29,8 +29,8 @@ mixin _$TourismService {
   String get location => throw _privateConstructorUsedError;
   String get category =>
       throw _privateConstructorUsedError; // company can be a plain String ID or a populated Company object from the backend
-  @JsonKey(fromJson: _parseId)
-  String get company => throw _privateConstructorUsedError;
+  @JsonKey(readValue: _readCompany, fromJson: _parseCompany)
+  dynamic get company => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _parseImages)
   List<String> get images => throw _privateConstructorUsedError;
@@ -62,7 +62,7 @@ abstract class $TourismServiceCopyWith<$Res> {
     @JsonKey(fromJson: _parsePrice) double price,
     String location,
     String category,
-    @JsonKey(fromJson: _parseId) String company,
+    @JsonKey(readValue: _readCompany, fromJson: _parseCompany) dynamic company,
     String? description,
     @JsonKey(fromJson: _parseImages) List<String> images,
     double rating,
@@ -93,7 +93,7 @@ class _$TourismServiceCopyWithImpl<$Res, $Val extends TourismService>
     Object? price = null,
     Object? location = null,
     Object? category = null,
-    Object? company = null,
+    Object? company = freezed,
     Object? description = freezed,
     Object? images = null,
     Object? rating = null,
@@ -122,10 +122,10 @@ class _$TourismServiceCopyWithImpl<$Res, $Val extends TourismService>
                 ? _value.category
                 : category // ignore: cast_nullable_to_non_nullable
                       as String,
-            company: null == company
+            company: freezed == company
                 ? _value.company
                 : company // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as dynamic,
             description: freezed == description
                 ? _value.description
                 : description // ignore: cast_nullable_to_non_nullable
@@ -181,7 +181,7 @@ abstract class _$$TourismServiceImplCopyWith<$Res>
     @JsonKey(fromJson: _parsePrice) double price,
     String location,
     String category,
-    @JsonKey(fromJson: _parseId) String company,
+    @JsonKey(readValue: _readCompany, fromJson: _parseCompany) dynamic company,
     String? description,
     @JsonKey(fromJson: _parseImages) List<String> images,
     double rating,
@@ -212,7 +212,7 @@ class __$$TourismServiceImplCopyWithImpl<$Res>
     Object? price = null,
     Object? location = null,
     Object? category = null,
-    Object? company = null,
+    Object? company = freezed,
     Object? description = freezed,
     Object? images = null,
     Object? rating = null,
@@ -241,10 +241,10 @@ class __$$TourismServiceImplCopyWithImpl<$Res>
             ? _value.category
             : category // ignore: cast_nullable_to_non_nullable
                   as String,
-        company: null == company
+        company: freezed == company
             ? _value.company
             : company // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as dynamic,
         description: freezed == description
             ? _value.description
             : description // ignore: cast_nullable_to_non_nullable
@@ -279,7 +279,8 @@ class _$TourismServiceImpl extends _TourismService {
     @JsonKey(fromJson: _parsePrice) this.price = 0.0,
     required this.location,
     required this.category,
-    @JsonKey(fromJson: _parseId) required this.company,
+    @JsonKey(readValue: _readCompany, fromJson: _parseCompany)
+    required this.company,
     this.description,
     @JsonKey(fromJson: _parseImages) final List<String> images = const [],
     this.rating = 0.0,
@@ -305,8 +306,8 @@ class _$TourismServiceImpl extends _TourismService {
   final String category;
   // company can be a plain String ID or a populated Company object from the backend
   @override
-  @JsonKey(fromJson: _parseId)
-  final String company;
+  @JsonKey(readValue: _readCompany, fromJson: _parseCompany)
+  final dynamic company;
   @override
   final String? description;
   final List<String> _images;
@@ -345,7 +346,7 @@ class _$TourismServiceImpl extends _TourismService {
                 other.location == location) &&
             (identical(other.category, category) ||
                 other.category == category) &&
-            (identical(other.company, company) || other.company == company) &&
+            const DeepCollectionEquality().equals(other.company, company) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
@@ -365,7 +366,7 @@ class _$TourismServiceImpl extends _TourismService {
     price,
     location,
     category,
-    company,
+    const DeepCollectionEquality().hash(company),
     description,
     const DeepCollectionEquality().hash(_images),
     rating,
@@ -397,7 +398,8 @@ abstract class _TourismService extends TourismService {
     @JsonKey(fromJson: _parsePrice) final double price,
     required final String location,
     required final String category,
-    @JsonKey(fromJson: _parseId) required final String company,
+    @JsonKey(readValue: _readCompany, fromJson: _parseCompany)
+    required final dynamic company,
     final String? description,
     @JsonKey(fromJson: _parseImages) final List<String> images,
     final double rating,
@@ -423,8 +425,8 @@ abstract class _TourismService extends TourismService {
   @override
   String get category; // company can be a plain String ID or a populated Company object from the backend
   @override
-  @JsonKey(fromJson: _parseId)
-  String get company;
+  @JsonKey(readValue: _readCompany, fromJson: _parseCompany)
+  dynamic get company;
   @override
   String? get description;
   @override

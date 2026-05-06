@@ -213,5 +213,38 @@ final notificationRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef NotificationRepositoryRef = ProviderRef<NotificationRepository>;
+String _$profileRepositoryHash() => r'c8663d85eb116dc218d7a981210e394096ee8a20';
+
+/// See also [profileRepository].
+@ProviderFor(profileRepository)
+final profileRepositoryProvider = Provider<SupabaseProfileRepository>.internal(
+  profileRepository,
+  name: r'profileRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$profileRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ProfileRepositoryRef = ProviderRef<SupabaseProfileRepository>;
+String _$mainNavNotifierHash() => r'7a5dfbc617bed7f255d789948cce117c63fc2770';
+
+/// See also [MainNavNotifier].
+@ProviderFor(MainNavNotifier)
+final mainNavNotifierProvider =
+    AutoDisposeNotifierProvider<MainNavNotifier, int>.internal(
+      MainNavNotifier.new,
+      name: r'mainNavNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$mainNavNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$MainNavNotifier = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

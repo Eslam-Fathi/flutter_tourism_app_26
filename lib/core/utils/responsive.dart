@@ -31,15 +31,15 @@ class Responsive {
   /// Returns the constrained content max width for the current layout.
   static double contentMaxWidth(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
-    if (w >= tabletMax) return 1100;
-    if (w >= mobileMax) return 720;
-    return double.infinity;
+    if (w >= 1100) return 1100;
+    if (w >= mobileMax) return w; // On smaller screens, use full width or constrained by padding
+    return w;
   }
 
   /// Returns horizontal padding based on screen width.
   static double horizontalPadding(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
-    if (w >= tabletMax) return (w - 1100) / 2;
+    if (w >= 1100) return (w - 1100) / 2;
     if (w >= mobileMax) return 32;
     return 20;
   }

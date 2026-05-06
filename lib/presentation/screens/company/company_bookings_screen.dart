@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/booking/booking_provider.dart';
+import 'package:flutter_tourism_app_26/presentation/screens/company/widgets/guide_selection_dialog.dart'
+    show GuideSelectionDialog;
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/data/models/user_model.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/base/base_providers.dart';
-import 'widgets/guide_selection_dialog.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 
 class CompanyBookingsScreen extends ConsumerWidget {
   const CompanyBookingsScreen({super.key});
@@ -24,9 +26,9 @@ class CompanyBookingsScreen extends ConsumerWidget {
             slivers: [
               SliverAppBar(
                 backgroundColor: Colors.transparent,
-                title: const Text(
-                  'Manage Bookings',
-                  style: TextStyle(
+                title: Text(
+                  AppLocalizations.of(context)!.manageBookings,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -39,11 +41,11 @@ class CompanyBookingsScreen extends ConsumerWidget {
                 sliver: bookingsAsync.when(
                   data: (bookings) {
                     if (bookings.isEmpty) {
-                      return const SliverToBoxAdapter(
+                      return SliverToBoxAdapter(
                         child: Center(
                           child: Text(
-                            'There are no bookings yet.',
-                            style: TextStyle(color: Colors.white70),
+                            AppLocalizations.of(context)!.noBookingsYet,
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ),
                       );
@@ -67,7 +69,11 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Booking #${booking.id.substring(0, 8)}',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.bookingIdLabel(
+                                      booking.id.substring(0, 8),
+                                    ),
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 12,
@@ -183,10 +189,14 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.withValues(alpha: 0.1),
+                                        color: Colors.blue.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         borderRadius: BorderRadius.circular(10),
                                         border: Border.all(
-                                          color: Colors.blue.withValues(alpha: 0.2),
+                                          color: Colors.blue.withValues(
+                                            alpha: 0.2,
+                                          ),
                                         ),
                                       ),
                                       child: Row(
@@ -225,9 +235,11 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                               horizontal: 16,
                                             ),
                                           ),
-                                          child: const Text(
-                                            'Reject',
-                                            style: TextStyle(
+                                          child: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.reject,
+                                            style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
@@ -253,9 +265,11 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                             booking.id,
                                             'confirmed',
                                           ),
-                                          child: const Text(
-                                            'Confirm',
-                                            style: TextStyle(
+                                          child: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.confirm,
+                                            style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
@@ -275,9 +289,11 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                         LucideIcons.userPlus,
                                         size: 14,
                                       ),
-                                      label: const Text(
-                                        'Assign Guide',
-                                        style: TextStyle(fontSize: 12),
+                                      label: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.assignGuide,
+                                        style: const TextStyle(fontSize: 12),
                                       ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primary,
@@ -307,7 +323,9 @@ class CompanyBookingsScreen extends ConsumerWidget {
                                         size: 16,
                                         color: Colors.white70,
                                       ),
-                                      tooltip: 'Change Guide',
+                                      tooltip: AppLocalizations.of(
+                                        context,
+                                      )!.changeGuide,
                                     ),
                                 ],
                               ),
@@ -359,7 +377,9 @@ class CompanyBookingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Booking ${status == 'confirmed' ? 'confirmed' : 'rejected'} successfully',
+              status == 'confirmed'
+                  ? AppLocalizations.of(context)!.bookingConfirmedSuccess
+                  : AppLocalizations.of(context)!.bookingRejectedSuccess,
             ),
             backgroundColor: status == 'confirmed'
                 ? Colors.green
@@ -375,14 +395,13 @@ class CompanyBookingsScreen extends ConsumerWidget {
       }
     }
   }
+
   Future<void> _showGuideSelection(
     BuildContext context,
     WidgetRef ref,
     String bookingId, [
     String? currentGuideId,
   ]) async {
-
-
     final guide = await showDialog<User>(
       context: context,
       builder: (context) => const GuideSelectionDialog(),
@@ -390,13 +409,15 @@ class CompanyBookingsScreen extends ConsumerWidget {
 
     if (guide != null && context.mounted) {
       try {
-        await ref.read(bookingRepositoryProvider).assignGuide(bookingId, guide.id);
+        await ref
+            .read(bookingRepositoryProvider)
+            .assignGuide(bookingId, guide.id);
         // Explicitly invalidate company bookings to ensure UI refresh
         ref.invalidate(companyBookingsProvider);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Tour guide assigned successfully'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.guideAssignedSuccess),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
             ),
@@ -406,7 +427,7 @@ class CompanyBookingsScreen extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'), 
+              content: Text('Error: $e'),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'create_company_screen.dart';
 
 class AdminDashboardOverview extends StatelessWidget {
@@ -17,8 +18,8 @@ class AdminDashboardOverview extends StatelessWidget {
             slivers: [
               SliverAppBar(
                 backgroundColor: Colors.transparent,
-                title: const Text(
-                  'Admin Overview',
+                title: Text(
+                  AppLocalizations.of(context)!.adminOverview,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -33,9 +34,9 @@ class AdminDashboardOverview extends StatelessWidget {
                   delegate: SliverChildListDelegate([
                     _buildStatCards(),
                     const SizedBox(height: 24),
-                    _buildRevenueChart(),
+                    _buildRevenueChart(context),
                     const SizedBox(height: 24),
-                    ..._buildRecentFeedback(),
+                    ..._buildRecentFeedback(context),
                   ]),
                 ),
               ),
@@ -55,7 +56,7 @@ class AdminDashboardOverview extends StatelessWidget {
         },
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add_business, color: Colors.white),
-        label: const Text('Add Company', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text(AppLocalizations.of(context)!.addCompany, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -66,28 +67,28 @@ class AdminDashboardOverview extends StatelessWidget {
         final isMobile = constraints.maxWidth < 600;
         final cards = [
           _StatCard(
-            title: 'Total Users',
+            title: AppLocalizations.of(context)!.totalUsers,
             value: '1,240',
             icon: Icons.people,
             color: Colors.blueAccent,
             progress: 0.8,
           ),
           _StatCard(
-            title: 'Companies',
+            title: AppLocalizations.of(context)!.companies,
             value: '45',
             icon: Icons.business,
             color: Colors.orangeAccent,
             progress: 0.4,
           ),
           _StatCard(
-            title: 'Bookings',
+            title: AppLocalizations.of(context)!.bookings,
             value: '312',
             icon: Icons.book_online,
             color: Colors.greenAccent,
             progress: 0.6,
           ),
           _StatCard(
-            title: 'Revenue',
+            title: AppLocalizations.of(context)!.revenue,
             value: '\$14.2k',
             icon: Icons.monetization_on,
             color: Colors.purpleAccent,
@@ -132,7 +133,7 @@ class AdminDashboardOverview extends StatelessWidget {
     );
   }
 
-  Widget _buildRevenueChart() {
+  Widget _buildRevenueChart(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       height: 250,
@@ -144,8 +145,8 @@ class AdminDashboardOverview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Revenue Overview',
+          Text(
+            AppLocalizations.of(context)!.revenueOverview,
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -157,7 +158,7 @@ class AdminDashboardOverview extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 gridData: const FlGridData(show: false),
-                titlesData: const FlTitlesData(
+                titlesData: FlTitlesData(
                   leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -165,7 +166,7 @@ class AdminDashboardOverview extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 22,
-                      getTitlesWidget: _bottomTitleWidgets,
+                      getTitlesWidget: (v, m) => _buildBottomTitleWidgets(context, v, m),
                     ),
                   ),
                 ),
@@ -213,7 +214,7 @@ class AdminDashboardOverview extends StatelessWidget {
     );
   }
 
-  static Widget _bottomTitleWidgets(double value, TitleMeta meta) {
+  Widget _buildBottomTitleWidgets(BuildContext context, double value, TitleMeta meta) {
     const style = TextStyle(
       color: Colors.white54,
       fontWeight: FontWeight.bold,
@@ -222,25 +223,25 @@ class AdminDashboardOverview extends StatelessWidget {
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = const Text('Mon', style: style);
+        text = Text(AppLocalizations.of(context)!.mon, style: style);
         break;
       case 1:
-        text = const Text('Tue', style: style);
+        text = Text(AppLocalizations.of(context)!.tue, style: style);
         break;
       case 2:
-        text = const Text('Wed', style: style);
+        text = Text(AppLocalizations.of(context)!.wed, style: style);
         break;
       case 3:
-        text = const Text('Thu', style: style);
+        text = Text(AppLocalizations.of(context)!.thu, style: style);
         break;
       case 4:
-        text = const Text('Fri', style: style);
+        text = Text(AppLocalizations.of(context)!.fri, style: style);
         break;
       case 5:
-        text = const Text('Sat', style: style);
+        text = Text(AppLocalizations.of(context)!.sat, style: style);
         break;
       case 6:
-        text = const Text('Sun', style: style);
+        text = Text(AppLocalizations.of(context)!.sun, style: style);
         break;
       default:
         text = const Text('', style: style);
@@ -253,10 +254,10 @@ class AdminDashboardOverview extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildRecentFeedback() {
+  List<Widget> _buildRecentFeedback(BuildContext context) {
     return [
-      const Text(
-        'Recent Feedback',
+      Text(
+        AppLocalizations.of(context)!.recentFeedback,
         style: TextStyle(
           color: Colors.white,
           fontSize: 18,

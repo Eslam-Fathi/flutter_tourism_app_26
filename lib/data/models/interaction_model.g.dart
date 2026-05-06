@@ -9,7 +9,7 @@ part of 'interaction_model.dart';
 _$ReviewImpl _$$ReviewImplFromJson(Map<String, dynamic> json) => _$ReviewImpl(
   id: json['_id'] as String,
   serviceId: json['service'] as String,
-  user: User.fromJson(json['user'] as Map<String, dynamic>),
+  user: _parseUser(json['user']),
   rating: (json['rating'] as num).toInt(),
   comment: json['comment'] as String,
   createdAt: json['createdAt'] == null
@@ -30,7 +30,7 @@ Map<String, dynamic> _$$ReviewImplToJson(_$ReviewImpl instance) =>
 _$FavoriteImpl _$$FavoriteImplFromJson(Map<String, dynamic> json) =>
     _$FavoriteImpl(
       id: json['_id'] as String,
-      service: TourismService.fromJson(json['service'] as Map<String, dynamic>),
+      service: _parseService(json['service']),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

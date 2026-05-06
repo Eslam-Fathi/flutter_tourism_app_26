@@ -13,6 +13,10 @@ import '../../providers/booking/booking_provider.dart';
 import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 import 'widgets/review_widgets.dart';
 import '../../providers/user/user_provider.dart';
+import '../../providers/interaction/interaction_provider.dart';
+import '../../widgets/service_location_map.dart';
+import '../../widgets/weather_forecast_widget.dart';
+import '../../../core/utils/location_mapper.dart';
 
 class ServiceDetailsScreen extends ConsumerStatefulWidget {
   final TourismService service;
@@ -386,6 +390,21 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                             ],
                           ),
                         ),
+                        const SizedBox(height: 24),
+
+                        // Weather Forecast
+                        WeatherForecastWidget(
+                          lat: LocationMapper.getCoordinates(widget.service.location).latitude,
+                          lng: LocationMapper.getCoordinates(widget.service.location).longitude,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Map Section
+                        ServiceLocationMap(
+                          locationName: widget.service.location,
+                          title: widget.service.title,
+                        ),
+                        const SizedBox(height: 28),
 
                         // Date selector
                         GestureDetector(
@@ -474,11 +493,21 @@ class _ServiceDetailsScreenState extends ConsumerState<ServiceDetailsScreen>
                     _CircleNavBtn(icon: Icons.share_outlined, onTap: () {}),
                     const SizedBox(width: 10),
                     _CircleNavBtn(
-                      icon: _isFavorited
+                      icon: ref.watch(favoriteNotifierProvider).maybeWhen(
+                            data: (favs) => favs.any((f) => f.service.id == widget.service.id),
+                            orElse: () => false,
+                          )
                           ? Icons.favorite
                           : Icons.favorite_border,
-                      iconColor: _isFavorited ? Colors.redAccent : Colors.white,
-                      onTap: () => setState(() => _isFavorited = !_isFavorited),
+                      iconColor: ref.watch(favoriteNotifierProvider).maybeWhen(
+                            data: (favs) => favs.any((f) => f.service.id == widget.service.id),
+                            orElse: () => false,
+                          )
+                          ? Colors.redAccent
+                          : Colors.white,
+                      onTap: () {
+                        ref.read(favoriteNotifierProvider.notifier).toggleFavorite(widget.service.id);
+                      },
                     ),
                   ],
                 ),

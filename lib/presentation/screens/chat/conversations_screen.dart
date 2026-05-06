@@ -13,9 +13,10 @@ class ConversationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookingsState = ref.watch(bookingNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
     final currentUser = authState.user;
+    final isTourGuide = currentUser?.role == 'TourGuide';
+    final bookingsState = ref.watch(isTourGuide ? allBookingsProvider : bookingNotifierProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -122,7 +123,7 @@ class ConversationsScreen extends ConsumerWidget {
                         final booking = sortedConversations[index];
                         return _ConversationCard(
                           booking: booking,
-                          isMe: currentUser?.id == booking.user,
+                          isMe: currentUser?.id == booking.user?.id,
                         );
                       },
                     );

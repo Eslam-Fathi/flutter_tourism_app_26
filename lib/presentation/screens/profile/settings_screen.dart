@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/aurora_background.dart';
-import '../../providers/theme/locale_provider.dart';
+import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
+import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/theme/locale_provider.dart';
+import 'package:flutter_tourism_app_26/core/utils/responsive.dart';
 
-/// Screen for user settings, including language selection.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -13,6 +13,9 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeNotifierProvider);
+    
+    final maxW = Responsive.contentMaxWidth(context);
+    final hp = Responsive.horizontalPadding(context);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -32,74 +35,73 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: AuroraBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.preferences,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Language Selection Container
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxW),
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: hp + 24, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.preferences,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Language Selection Container
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.language, color: AppColors.primary),
-                          const SizedBox(width: 12),
-                          Text(
-                            l10n.language,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          Row(
+                            children: [
+                              const Icon(Icons.language, color: AppColors.primary),
+                              const SizedBox(width: 12),
+                              Text(
+                                l10n.language,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // Language Options
+                          _LanguageOption(
+                            title: 'English',
+                            isSelected: currentLocale.languageCode == 'en',
+                            onTap: () => ref
+                                .read(localeNotifierProvider.notifier)
+                                .setLocale(const Locale('en')),
+                          ),
+                          Divider(height: 1, color: Colors.white.withOpacity(0.05)),
+                          _LanguageOption(
+                            title: 'العربية (Arabic)',
+                            isSelected: currentLocale.languageCode == 'ar',
+                            onTap: () => ref
+                                .read(localeNotifierProvider.notifier)
+                                .setLocale(const Locale('ar')),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      // Language Options
-                      _LanguageOption(
-                        title: 'English',
-                        isSelected: currentLocale.languageCode == 'en',
-                        onTap: () => ref
-                            .read(localeNotifierProvider.notifier)
-                            .setLocale(const Locale('en')),
-                      ),
-                      const Divider(height: 1),
-                      _LanguageOption(
-                        title: 'العربية (Arabic)',
-                        isSelected: currentLocale.languageCode == 'ar',
-                        onTap: () => ref
-                            .read(localeNotifierProvider.notifier)
-                            .setLocale(const Locale('ar')),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

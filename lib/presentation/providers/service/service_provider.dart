@@ -28,7 +28,10 @@ class ServiceNotifier extends _$ServiceNotifier {
     final companies = await ref.read(companyNotifierProvider.future);
     final approvedCompanyIds = companies.where((c) => c.approved).map((c) => c.id).toSet();
     
-    return response.data.where((s) => approvedCompanyIds.contains(s.company)).toList();
+    return response.data.where((s) {
+      final id = s.companyId;
+      return id != null && approvedCompanyIds.contains(id);
+    }).toList();
   }
 
   Future<void> refresh() async {
@@ -62,5 +65,5 @@ Future<List<TourismService>> companyServices(CompanyServicesRef ref) async {
   
   if (myComp == null) return [];
   
-  return services.where((s) => s.company == myComp.id).toList();
+  return services.where((s) => s.companyId == myComp.id).toList();
 }

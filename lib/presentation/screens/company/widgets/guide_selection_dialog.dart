@@ -44,11 +44,13 @@ class _GuideSelectionDialogState extends ConsumerState<GuideSelectionDialog> {
             const SizedBox(height: 16),
             TextField(
               onChanged: (value) => setState(() => _searchQuery = value),
+              maxLength: 50,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Search guides...',
                 hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                 prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                counterText: '',
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.05),
 

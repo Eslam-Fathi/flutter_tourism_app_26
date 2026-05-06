@@ -170,7 +170,7 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
               const SizedBox(height: 16),
               _buildTextField('Location (e.g. Giza, Egypt)', _locationController, Icons.location_on_outlined),
               const SizedBox(height: 16),
-              _buildTextField('Article Content', _contentController, Icons.article_outlined, maxLines: 5),
+              _buildTextField('Article Content', _contentController, Icons.article_outlined, maxLines: 5, maxLength: 5000),
 
               const SizedBox(height: 32),
 
@@ -203,7 +203,7 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {int maxLines = 1}) {
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {int maxLines = 1, int? maxLength}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,6 +215,7 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          maxLength: maxLength ?? 100,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: AppColors.primary.withOpacity(0.7), size: 20),
@@ -225,6 +226,7 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            counterStyle: const TextStyle(color: Colors.white54, fontSize: 10),
           ),
         ),
       ],

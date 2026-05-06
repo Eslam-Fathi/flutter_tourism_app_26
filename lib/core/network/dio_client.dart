@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../storage/token_storage.dart';
+import 'interceptors/rate_limit_interceptor.dart';
+import 'interceptors/sanitization_interceptor.dart';
 
 class DioClient {
-  static const String baseUrl = 'https://se-yaha.vercel.app';
+  static String get baseUrl => dotenv.get('API_BASE_URL', fallback: 'https://se-yaha.vercel.app');
   final TokenStorage _tokenStorage;
   late final Dio _dio;
 
@@ -21,6 +25,8 @@ class DioClient {
       ),
     );
 
+    _dio.interceptors.add(SanitizationInterceptor());
+    _dio.interceptors.add(RateLimitInterceptor());
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -40,16 +46,18 @@ class DioClient {
     );
 
     // Logging only in debug mode
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-      ),
-    );
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        PrettyDioLogger(
+          requestHeader: true,
+          requestBody: true,
+          responseBody: true,
+          responseHeader: false,
+          error: true,
+          compact: true,
+        ),
+      );
+    }
   }
 
   Dio get instance => _dio;

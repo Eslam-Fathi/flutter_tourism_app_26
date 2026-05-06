@@ -23,6 +23,14 @@ class InteractionRepository {
     }
   }
 
+  Future<void> removeFavorite(String serviceId) async {
+    try {
+      await _dio.delete('/api/favorites/$serviceId');
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   Future<List<Favorite>> getMyFavorites() async {
     try {
       final response = await _dio.get('/api/favorites');

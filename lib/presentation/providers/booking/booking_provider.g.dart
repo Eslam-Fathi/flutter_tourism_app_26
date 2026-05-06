@@ -24,7 +24,24 @@ final companyBookingsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CompanyBookingsRef = AutoDisposeFutureProviderRef<List<Booking>>;
-String _$bookingNotifierHash() => r'1da76726af84613f83695b7d12131a5dbfbbc0e8';
+String _$allBookingsHash() => r'4ab3312dc1875d4c56f95b548d4f0f663081497c';
+
+/// See also [allBookings].
+@ProviderFor(allBookings)
+final allBookingsProvider = AutoDisposeFutureProvider<List<Booking>>.internal(
+  allBookings,
+  name: r'allBookingsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$allBookingsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllBookingsRef = AutoDisposeFutureProviderRef<List<Booking>>;
+String _$bookingNotifierHash() => r'7dd1e93a641e556c0234c9cb20d923e583f119d2';
 
 /// See also [BookingNotifier].
 @ProviderFor(BookingNotifier)

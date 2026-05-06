@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/aurora_background.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 
 /// Screen allowing administrators to create a new company account.
 /// Includes a secure form and premium Aurora UI styling.
@@ -46,14 +47,14 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Company created successfully!')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.companyCreatedSuccess)),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: $e')),
         );
       }
     } finally {
@@ -74,9 +75,9 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Create Company',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.createCompany,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: AuroraBackground(
@@ -88,9 +89,9 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Company Details',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.companyDetails,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -98,7 +99,7 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter the details to register a new service provider.',
+                    AppLocalizations.of(context)!.registerServiceProviderHint,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -109,21 +110,21 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
                   // Company Name Input
                   _buildInputField(
                     controller: _nameController,
-                    label: 'Company Name',
+                    label: AppLocalizations.of(context)!.companyName,
                     icon: Icons.business,
-                    validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                    validator: (val) => val == null || val.isEmpty ? AppLocalizations.of(context)!.requiredField : null,
                   ),
                   const SizedBox(height: 20),
 
                   // Email Input
                   _buildInputField(
                     controller: _emailController,
-                    label: 'Email Address',
+                    label: AppLocalizations.of(context)!.emailAddress,
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
                     validator: (val) {
-                      if (val == null || val.isEmpty) return 'Required';
-                      if (!val.contains('@')) return 'Invalid email';
+                      if (val == null || val.isEmpty) return AppLocalizations.of(context)!.requiredField;
+                      if (!val.contains('@')) return AppLocalizations.of(context)!.invalidEmail;
                       return null;
                     },
                   ),
@@ -132,17 +133,17 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
                   // Password Input
                   _buildInputField(
                     controller: _passwordController,
-                    label: 'Initial Password',
+                    label: AppLocalizations.of(context)!.initialPassword,
                     icon: Icons.lock,
                     obscureText: true,
-                    validator: (val) => val == null || val.length < 6 ? 'Min 6 chars required' : null,
+                    validator: (val) => val == null || val.length < 6 ? AppLocalizations.of(context)!.min6Chars : null,
                   ),
                   const SizedBox(height: 20),
 
                   // Description Input
                   _buildInputField(
                     controller: _descriptionController,
-                    label: 'Description',
+                    label: AppLocalizations.of(context)!.description,
                     icon: Icons.description,
                     maxLines: 3,
                   ),
@@ -166,9 +167,9 @@ class _CreateCompanyScreenState extends ConsumerState<CreateCompanyScreen> {
                               width: 24,
                               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                             )
-                          : const Text(
-                              'Create Company Account',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          : Text(
+                              AppLocalizations.of(context)!.createCompanyAccount,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                     ),
                   ),

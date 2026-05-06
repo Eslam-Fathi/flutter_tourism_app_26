@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import '../../providers/admin/user_management_provider.dart';
 
 class AdminUsersScreen extends ConsumerStatefulWidget {
@@ -34,8 +35,8 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             slivers: [
               SliverAppBar(
                 backgroundColor: Colors.transparent,
-                title: const Text(
-                  'User Management',
+                title: Text(
+                  AppLocalizations.of(context)!.userManagement,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -47,22 +48,31 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
               // Search Bar
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: TextField(
                     controller: _searchController,
                     onChanged: (val) => setState(() => _query = val),
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: 'Search users by name, email or role...',
+                      hintText: AppLocalizations.of(context)!.searchUsersHint,
                       hintStyle: const TextStyle(color: Colors.white38),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white38),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.white38,
+                      ),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                 ),
@@ -78,8 +88,12 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                             padding: const EdgeInsets.all(32),
                             child: Text(
                               _query.isEmpty
-                                  ? 'No users registered yet.'
-                                  : 'No users found matching "\$_query"',
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.noUsersRegistered
+                                  : AppLocalizations.of(
+                                      context,
+                                    )!.noUsersFoundMatching(_query),
                               style: const TextStyle(color: Colors.white70),
                             ),
                           ),
@@ -87,25 +101,24 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                       );
                     }
                     return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final user = filteredUserList[index];
-                          return _CompanyAdminTile(
-                            name: user.name,
-                            email: user.email,
-                            role: user.role,
-                            userId: user.id,
-                          );
-                        },
-                        childCount: filteredUserList.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final user = filteredUserList[index];
+                        return _CompanyAdminTile(
+                          name: user.name,
+                          email: user.email,
+                          role: user.role,
+                          userId: user.id,
+                        );
+                      }, childCount: filteredUserList.length),
                     );
                   },
                   loading: () => const SliverToBoxAdapter(
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(color: AppColors.primary),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -159,8 +172,8 @@ class _CompanyAdminTile extends ConsumerWidget {
           color: isAdmin
               ? Colors.redAccent.withValues(alpha: 0.5)
               : isCompany
-                  ? Colors.blueAccent.withValues(alpha: 0.5)
-                  : Colors.white12,
+              ? Colors.blueAccent.withValues(alpha: 0.5)
+              : Colors.white12,
         ),
       ),
       child: Row(
@@ -169,8 +182,8 @@ class _CompanyAdminTile extends ConsumerWidget {
             backgroundColor: isAdmin
                 ? Colors.redAccent
                 : isCompany
-                    ? Colors.blueAccent
-                    : AppColors.primary,
+                ? Colors.blueAccent
+                : AppColors.primary,
             child: Text(
               name.isNotEmpty ? name[0].toUpperCase() : '?',
               style: const TextStyle(
@@ -203,13 +216,16 @@ class _CompanyAdminTile extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isAdmin
                       ? Colors.redAccent.withValues(alpha: 0.2)
                       : isCompany
-                          ? Colors.blueAccent.withValues(alpha: 0.2)
-                          : Colors.white12,
+                      ? Colors.blueAccent.withValues(alpha: 0.2)
+                      : Colors.white12,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -218,8 +234,8 @@ class _CompanyAdminTile extends ConsumerWidget {
                     color: isAdmin
                         ? Colors.redAccent
                         : isCompany
-                            ? Colors.blueAccent
-                            : Colors.white70,
+                        ? Colors.blueAccent
+                        : Colors.white70,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -231,9 +247,9 @@ class _CompanyAdminTile extends ConsumerWidget {
                   onTap: () {
                     _showDeleteConfirm(context, ref);
                   },
-                  child: const Text(
-                    'Remove',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.removeUser,
+                    style: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 12,
                       decoration: TextDecoration.underline,
@@ -261,14 +277,22 @@ class _CompanyAdminTile extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white38)),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(color: Colors.white38),
+            ),
           ),
           TextButton(
             onPressed: () {
-              ref.read(userManagementNotifierProvider.notifier).deleteUser(userId);
+              ref
+                  .read(userManagementNotifierProvider.notifier)
+                  .deleteUser(userId);
               Navigator.pop(context);
             },
-            child: const Text('Remove', style: TextStyle(color: Colors.redAccent)),
+            child: Text(
+              AppLocalizations.of(context)!.removeUser,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),

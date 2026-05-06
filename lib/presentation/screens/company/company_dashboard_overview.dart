@@ -10,6 +10,8 @@ import '../../../../data/models/booking_model.dart';
 import '../../../../data/models/service_model.dart';
 import 'package:flutter_tourism_app_26/data/models/company_model.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/company/company_provider.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/interaction/review_provider.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 
 class CompanyDashboardOverview extends ConsumerWidget {
   const CompanyDashboardOverview({super.key});
@@ -28,32 +30,41 @@ class CompanyDashboardOverview extends ConsumerWidget {
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _buildHeader(user?.name ?? 'Manager'),
+              _buildHeader(context, user?.name ?? 'Manager'),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     const SizedBox(height: 24),
-                    _buildRevenueChart(bookingsAsync),
+                    _buildRevenueChart(context, bookingsAsync),
                     const SizedBox(height: 24),
                     myCompanyAsync.when(
                       data: (comp) => comp != null && !comp.approved
-                          ? _buildApprovalWarning()
+                          ? _buildApprovalWarning(context)
                           : const SizedBox.shrink(),
                       loading: () => const SizedBox.shrink(),
                       error: (_, __) => const SizedBox.shrink(),
                     ),
                     const SizedBox(height: 16),
-                    _buildStatsGrid(servicesAsync, bookingsAsync),
+                    _buildStatsGrid(context, servicesAsync, bookingsAsync),
                     const SizedBox(height: 32),
                     _buildQuickActions(context, myCompanyAsync),
                     const SizedBox(height: 32),
-                    _buildRecentBookingsHeader(),
+                    _buildRecentBookingsHeader(context),
                     const SizedBox(height: 16),
                   ]),
                 ),
               ),
-              _buildRecentBookingsList(bookingsAsync),
+              _buildRecentBookingsList(context, bookingsAsync),
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverToBoxAdapter(
+                  child: _buildRecentReviewsHeader(context),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              _buildRecentReviewsList(context, ref, servicesAsync),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
@@ -62,7 +73,8 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(String name) {
+  Widget _buildHeader(BuildContext context, String name) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -73,15 +85,15 @@ class CompanyDashboardOverview extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dashboard Overview',
+                  l10n.dashboardOverview,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
-                  'Welcome back, $name',
+                  l10n.welcomeBack(name),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -92,12 +104,15 @@ class CompanyDashboardOverview extends ConsumerWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                icon: const Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -106,32 +121,32 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildRevenueChart(AsyncValue<List<Booking>> bookingsAsync) {
+  Widget _buildRevenueChart(BuildContext context, AsyncValue<List<Booking>> bookingsAsync) {
     return Container(
       height: 300,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surfaceDark.withOpacity(0.4),
+        color: AppColors.surfaceDark.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Revenue Status',
-                style: TextStyle(
+                AppLocalizations.of(context)!.revenueStatus,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                'Estimated from confirmed bookings',
-                style: TextStyle(color: Colors.white38, fontSize: 12),
+                AppLocalizations.of(context)!.revenueNote,
+                style: const TextStyle(color: Colors.white38, fontSize: 12),
               ),
             ],
           ),
@@ -168,8 +183,8 @@ class CompanyDashboardOverview extends ConsumerWidget {
                           show: true,
                           gradient: LinearGradient(
                             colors: [
-                              Colors.blueAccent.withOpacity(0.2),
-                              AppColors.primary.withOpacity(0.0),
+                              Colors.blueAccent.withValues(alpha: 0.2),
+                              AppColors.primary.withValues(alpha: 0.0),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -181,7 +196,8 @@ class CompanyDashboardOverview extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Icon(Icons.error, color: Colors.red)),
+              error: (_, __) =>
+                  const Center(child: Icon(Icons.error, color: Colors.red)),
             ),
           ),
         ],
@@ -190,44 +206,52 @@ class CompanyDashboardOverview extends ConsumerWidget {
   }
 
   Widget _buildStatsGrid(
-      AsyncValue<List<TourismService>> servicesAsync,
-      AsyncValue<List<Booking>> bookingsAsync) {
+    BuildContext context,
+    AsyncValue<List<TourismService>> servicesAsync,
+    AsyncValue<List<Booking>> bookingsAsync,
+  ) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final itemWidth = (constraints.maxWidth - 16) / 2;
-        
+
         final servicesCount = servicesAsync.valueOrNull?.length ?? 0;
         final bookingsCount = bookingsAsync.valueOrNull?.length ?? 0;
-        final totalRevenue = bookingsAsync.valueOrNull?.fold(0.0, (sum, b) => 
-          (b.status == 'confirmed' || b.status == 'completed') ? sum + b.totalPrice : sum) ?? 0.0;
+        final totalRevenue =
+            bookingsAsync.valueOrNull?.fold(
+              0.0,
+              (sum, b) => (b.status == 'confirmed' || b.status == 'completed')
+                  ? sum + b.totalPrice
+                  : sum,
+            ) ??
+            0.0;
 
         return Wrap(
           spacing: 16,
           runSpacing: 16,
           children: [
             _buildStatBox(
-              'Active Services',
+              AppLocalizations.of(context)!.activeServices,
               servicesCount.toString(),
               Icons.map_outlined,
               Colors.blueAccent,
               itemWidth,
             ),
             _buildStatBox(
-              'Total Bookings',
+              AppLocalizations.of(context)!.totalBookings,
               bookingsCount.toString(),
               Icons.book_online_outlined,
               Colors.greenAccent,
               itemWidth,
             ),
             _buildStatBox(
-              'Tour Guides',
+              AppLocalizations.of(context)!.guides,
               '0', // Static until Guides module is connected
               Icons.people_outline,
               Colors.orangeAccent,
               itemWidth,
             ),
             _buildStatBox(
-              'Net Revenue',
+              AppLocalizations.of(context)!.netRevenue,
               '\$${(totalRevenue / 1000).toStringAsFixed(1)}k',
               Icons.account_balance_wallet_outlined,
               Colors.pinkAccent,
@@ -250,9 +274,9 @@ class CompanyDashboardOverview extends ConsumerWidget {
       width: width,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surfaceDark.withOpacity(0.4),
+        color: AppColors.surfaceDark.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +284,7 @@ class CompanyDashboardOverview extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -284,13 +308,16 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context, AsyncValue<Company?> myCompanyAsync) {
+  Widget _buildQuickActions(
+    BuildContext context,
+    AsyncValue<Company?> myCompanyAsync,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.quickActions,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -307,10 +334,26 @@ class CompanyDashboardOverview extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildActionButton(context, 'Add Trip', Icons.add_circle_outline),
-                    _buildActionButton(context, 'Guides', Icons.person_add_outlined),
-                    _buildActionButton(context, 'Reports', Icons.bar_chart),
-                    _buildActionButton(context, 'Settings', Icons.settings_outlined),
+                    _buildActionButton(
+                      context,
+                      AppLocalizations.of(context)!.addTrip,
+                      Icons.add_circle_outline,
+                    ),
+                    _buildActionButton(
+                      context,
+                      AppLocalizations.of(context)!.guides,
+                      Icons.person_add_outlined,
+                    ),
+                    _buildActionButton(
+                      context,
+                      AppLocalizations.of(context)!.reports,
+                      Icons.bar_chart,
+                    ),
+                    _buildActionButton(
+                      context,
+                      AppLocalizations.of(context)!.settings,
+                      Icons.settings_outlined,
+                    ),
                   ],
                 ),
               ),
@@ -323,33 +366,33 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildApprovalWarning() {
+  Widget _buildApprovalWarning(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.orangeAccent.withOpacity(0.15),
+        color: Colors.orangeAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.orangeAccent.withOpacity(0.3)),
+        border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.3)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
-          SizedBox(width: 16),
+          const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Account Pending Approval',
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.accountPendingApproval,
+                  style: const TextStyle(
                     color: Colors.orangeAccent,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                 ),
                 Text(
-                  'Your company is currently under review. You will be able to post services once an admin approves your request.',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                  AppLocalizations.of(context)!.accountUnderReview,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
@@ -366,9 +409,9 @@ class CompanyDashboardOverview extends ConsumerWidget {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.15),
+            color: AppColors.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           ),
           child: Icon(icon, color: Colors.blueAccent, size: 26),
         ),
@@ -381,21 +424,21 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentBookingsHeader() {
-    return const Row(
+  Widget _buildRecentBookingsHeader(BuildContext context) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Recent Activities',
-          style: TextStyle(
+          AppLocalizations.of(context)!.recentActivities,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
-          'View All',
-          style: TextStyle(
+          AppLocalizations.of(context)!.viewAll,
+          style: const TextStyle(
             color: Colors.blueAccent,
             fontSize: 14,
             fontWeight: FontWeight.bold,
@@ -405,82 +448,243 @@ class CompanyDashboardOverview extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentBookingsList(AsyncValue<List<Booking>> bookingsAsync) {
+  Widget _buildRecentBookingsList(BuildContext context, AsyncValue<List<Booking>> bookingsAsync) {
     return bookingsAsync.when(
       data: (bookings) {
         if (bookings.isEmpty) {
-          return const SliverToBoxAdapter(
+          return SliverToBoxAdapter(
             child: Center(
               child: Padding(
-                padding: EdgeInsets.all(32.0),
-                child: Text('No recent bookings found.', style: TextStyle(color: Colors.white38)),
+                padding: const EdgeInsets.all(32.0),
+                child: Text(
+                  AppLocalizations.of(context)!.noRecentBookings,
+                  style: const TextStyle(color: Colors.white38),
+                ),
               ),
             ),
           );
         }
-        
+
         final recent = bookings.take(5).toList();
 
         return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final booking = recent[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceDark.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.white10,
-                      child: Icon(Icons.person, color: Colors.white54, size: 20),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Booking: ${booking.tourismService.title}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final booking = recent[index];
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceDark.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Colors.white10,
+                    child: Icon(Icons.person, color: Colors.white54, size: 20),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.bookingLabel(booking.tourismService.title),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
                           ),
-                          Text(
-                            'Status: ${booking.status.toUpperCase()}',
-                            style: TextStyle(
-                              color: booking.status == 'confirmed' ? Colors.greenAccent : Colors.orangeAccent,
-                              fontSize: 12,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.statusLabel(booking.status.toUpperCase()),
+                          style: TextStyle(
+                            color: booking.status == 'confirmed'
+                                ? Colors.greenAccent
+                                : Colors.orangeAccent,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '\$${booking.totalPrice.toInt()}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }, childCount: recent.length),
+        );
+      },
+      loading: () => const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, __) => SliverToBoxAdapter(
+        child: Center(
+          child: Text(
+            '${AppLocalizations.of(context)!.recentActivities}: $error',
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentReviewsHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          AppLocalizations.of(context)!.serviceReviews,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          AppLocalizations.of(context)!.recent,
+          style: const TextStyle(color: Colors.white38, fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentReviewsList(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<TourismService>> servicesAsync,
+  ) {
+    return servicesAsync.when(
+      data: (services) {
+        if (services.isEmpty)
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+        // For the dashboard, we'll show reviews for the first few services
+        // Ideally we'd have a specific endpoint for "all company reviews"
+        final firstService = services.first;
+        final reviewsAsync = ref.watch(reviewNotifierProvider(firstService.id));
+
+        return reviewsAsync.when(
+          data: (reviews) {
+            if (reviews.isEmpty) {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.noReviewsYet,
+                    style: const TextStyle(color: Colors.white38),
+                  ),
+                ),
+              );
+            }
+
+            return SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final review = reviews[index];
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceDark.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 14,
+                            backgroundColor: AppColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
+                            child: Text(
+                              review.user.name[0].toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              review.user.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: List.generate(
+                              5,
+                              (i) => Icon(
+                                i < review.rating
+                                    ? Icons.star_rounded
+                                    : Icons.star_outline_rounded,
+                                color: Colors.amber,
+                                size: 12,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Text(
-                      '\$${booking.totalPrice.toInt()}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                      const SizedBox(height: 8),
+                      Text(
+                        review.comment,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 12,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-            childCount: recent.length,
+                      const SizedBox(height: 4),
+                      Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.onService(firstService.title),
+                        style: TextStyle(
+                          color: AppColors.primary.withValues(alpha: 0.5),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }, childCount: reviews.length > 3 ? 3 : reviews.length),
+            );
+          },
+          loading: () => const SliverToBoxAdapter(
+            child: Center(child: CircularProgressIndicator()),
           ),
+          error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
         );
       },
-      loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
-      error: (_, __) => const SliverToBoxAdapter(child: Center(child: Text('Error loading activities', style: TextStyle(color: Colors.red)))),
+      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+      error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
     );
   }
 }

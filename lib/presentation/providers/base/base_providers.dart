@@ -11,6 +11,7 @@ import '../../../data/repositories/user_repository.dart';
 import '../../../data/repositories/notification_repository.dart';
 import '../../../core/network/supabase_config.dart';
 import '../../../data/repositories/article_repository.dart';
+import '../../../data/repositories/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 part 'base_providers.g.dart';
@@ -84,4 +85,18 @@ UserRepository userRepository(UserRepositoryRef ref) {
 NotificationRepository notificationRepository(NotificationRepositoryRef ref) {
   final client = ref.watch(dioClientProvider);
   return NotificationRepository(dio: client.instance);
+}
+
+@Riverpod(keepAlive: true)
+SupabaseProfileRepository profileRepository(ProfileRepositoryRef ref) {
+  final supabase = ref.watch(supabaseClientProvider);
+  return SupabaseProfileRepository(supabase: supabase);
+}
+
+@riverpod
+class MainNavNotifier extends _$MainNavNotifier {
+  @override
+  int build() => 0;
+
+  void setIndex(int index) => state = index;
 }

@@ -64,6 +64,12 @@ dependencies:
   lucide_icons_flutter: ^3.1.13
   google_generative_ai: ^0.4.7
 
+  # Maps
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.1
+  flutter_map_cancellable_tile_provider: ^3.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

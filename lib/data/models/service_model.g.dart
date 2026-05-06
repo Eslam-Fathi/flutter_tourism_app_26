@@ -13,7 +13,7 @@ _$TourismServiceImpl _$$TourismServiceImplFromJson(Map<String, dynamic> json) =>
       price: json['price'] == null ? 0.0 : _parsePrice(json['price']),
       location: json['location'] as String,
       category: json['category'] as String,
-      company: _parseId(json['company']),
+      company: _parseCompany(_readCompany(json, 'company')),
       description: json['description'] as String?,
       images: json['images'] == null ? const [] : _parseImages(json['images']),
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,

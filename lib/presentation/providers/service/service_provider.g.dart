@@ -147,7 +147,7 @@ class _ServiceDetailsProviderElement
   String get id => (origin as ServiceDetailsProvider).id;
 }
 
-String _$companyServicesHash() => r'2a9ed3092329be9fd0872f59bd5c1fd1a9fed326';
+String _$companyServicesHash() => r'db9b6155394c9427d47ac67ef82f431c9a7dbdc7';
 
 /// See also [companyServices].
 @ProviderFor(companyServices)
@@ -165,7 +165,7 @@ final companyServicesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CompanyServicesRef = AutoDisposeFutureProviderRef<List<TourismService>>;
-String _$serviceNotifierHash() => r'6ca29e030b18d5659789cb25d6413c015498d628';
+String _$serviceNotifierHash() => r'd0e42bd89345988c5f6a4a5268bd3de49d9185a6';
 
 /// See also [ServiceNotifier].
 @ProviderFor(ServiceNotifier)

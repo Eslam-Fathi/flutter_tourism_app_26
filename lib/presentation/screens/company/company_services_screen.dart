@@ -11,6 +11,9 @@ import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/data/models/user_model.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/user/user_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/company/widgets/guide_selection_dialog.dart';
+import 'package:flutter_tourism_app_26/core/utils/location_mapper.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
+import 'package:flutter_tourism_app_26/presentation/widgets/service_location_map.dart';
 
 class CompanyServicesScreen extends ConsumerWidget {
   const CompanyServicesScreen({super.key});
@@ -37,8 +40,10 @@ class CompanyServicesScreen extends ConsumerWidget {
                 }
               : () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Your company is pending admin approval. You cannot add services yet.'),
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.pendingApprovalMsg,
+                      ),
                       backgroundColor: Colors.orange,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -46,9 +51,12 @@ class CompanyServicesScreen extends ConsumerWidget {
                 },
           backgroundColor: isApproved ? Colors.blueAccent : Colors.grey,
           icon: const Icon(Icons.add, color: Colors.white),
-          label: const Text(
-            'Add Trip Plan',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          label: Text(
+            AppLocalizations.of(context)!.addTripPlan,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -58,9 +66,9 @@ class CompanyServicesScreen extends ConsumerWidget {
             slivers: [
               SliverAppBar(
                 backgroundColor: Colors.transparent,
-                title: const Text(
-                  'My Trip Plans',
-                  style: TextStyle(
+                title: Text(
+                  AppLocalizations.of(context)!.myTripPlans,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -73,11 +81,11 @@ class CompanyServicesScreen extends ConsumerWidget {
                 sliver: servicesState.when(
                   data: (services) {
                     if (services.isEmpty) {
-                      return const SliverToBoxAdapter(
+                      return SliverToBoxAdapter(
                         child: Center(
                           child: Text(
-                            'There is no data. Add your first trip plan!',
-                            style: TextStyle(color: Colors.white70),
+                            AppLocalizations.of(context)!.noDataAddFirst,
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ),
                       );
@@ -143,34 +151,46 @@ class CompanyServicesScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                                Text(
-                                  '\$${service.price.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    color: Colors.greenAccent,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                              Text(
+                                '\$${service.price.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  color: Colors.greenAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => _CreateServiceDialog(service: service),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.edit_outlined, color: Colors.white54, size: 20),
-                                  tooltip: 'Edit Trip',
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        _CreateServiceDialog(service: service),
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.white54,
+                                  size: 20,
                                 ),
-                                IconButton(
-                                  onPressed: () => _confirmDelete(context, ref, service),
-                                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
-                                  tooltip: 'Delete Trip',
+                                tooltip: AppLocalizations.of(context)!.editTrip,
+                              ),
+                              IconButton(
+                                onPressed: () =>
+                                    _confirmDelete(context, ref, service),
+                                icon: const Icon(
+                                  Icons.delete_outline_rounded,
+                                  color: Colors.redAccent,
+                                  size: 20,
                                 ),
-                              ],
-                            ),
-                          );
-                        }, childCount: services.length),
+                                tooltip: AppLocalizations.of(
+                                  context,
+                                )!.deleteTrip,
+                              ),
+                            ],
+                          ),
+                        );
+                      }, childCount: services.length),
                     );
                   },
                   loading: () => const SliverToBoxAdapter(
@@ -204,34 +224,54 @@ class CompanyServicesScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Trip Plan?', style: TextStyle(color: Colors.white)),
-        content: Text('Are you sure you want to delete "${service.title}"? This action cannot be undone.', 
-          style: const TextStyle(color: Colors.white70)),
+        title: Text(
+          AppLocalizations.of(context)!.deleteTripQuestion,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          AppLocalizations.of(context)!.deleteTripConfirm(service.title),
+          style: const TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(color: Colors.white54),
+            ),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await ref.read(serviceRepositoryProvider).deleteService(service.id);
+                await ref
+                    .read(serviceRepositoryProvider)
+                    .deleteService(service.id);
                 ref.read(serviceNotifierProvider.notifier).refresh();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Trip Plan deleted successfully')),
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.tripDeletedSuccess,
+                      ),
+                    ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+                    SnackBar(
+                      content: Text('Error: $e'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                 }
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            child: Text(
+              AppLocalizations.of(context)!.delete,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
@@ -260,6 +300,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
   bool _isLoading = false;
   User? _selectedGuide;
   bool _guideInitialized = false;
+  bool _showMapPreview = false;
 
   @override
   void initState() {
@@ -294,7 +335,9 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
         _descriptionController.text.trim().isEmpty ||
         _selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.allFieldsRequired),
+        ),
       );
       return;
     }
@@ -323,7 +366,8 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       };
 
       if (_selectedGuide != null) {
-        serviceData['description'] = '${_descriptionController.text.trim()}\n\n[[guideId:${_selectedGuide!.id}]]';
+        serviceData['description'] =
+            '${_descriptionController.text.trim()}\n\n[[guideId:${_selectedGuide!.id}]]';
       }
 
       if (widget.service != null) {
@@ -340,7 +384,9 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              widget.service != null ? 'Trip Plan updated successfully!' : 'Trip Plan created successfully!',
+              widget.service != null
+                  ? AppLocalizations.of(context)!.tripPlanUpdated
+                  : AppLocalizations.of(context)!.tripPlanCreated,
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.green,
@@ -397,10 +443,16 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.map, color: Colors.blueAccent, size: 28),
+                          const Icon(
+                            Icons.map,
+                            color: Colors.blueAccent,
+                            size: 28,
+                          ),
                           const SizedBox(width: 12),
                           Text(
-                            widget.service != null ? 'Edit Trip Plan' : 'New Trip Plan',
+                            widget.service != null
+                                ? AppLocalizations.of(context)!.editTrip
+                                : AppLocalizations.of(context)!.newTripPlan,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -410,29 +462,41 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      _buildTextField('Title*', _titleController),
-                      const SizedBox(height: 16),
                       _buildTextField(
-                        'Description*',
-                        _descriptionController,
-                        maxLines: 3,
+                        AppLocalizations.of(context)!.titleWithStar,
+                        _titleController,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        'Price*',
+                        AppLocalizations.of(context)!.descriptionWithStar,
+                        _descriptionController,
+                        maxLines: 3,
+                        maxLength: 2000,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        AppLocalizations.of(context)!.priceWithStar,
                         _priceController,
                         isNumber: true,
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField('Location*', _locationController),
+                      _buildLocationPicker(),
+                      if (_showMapPreview &&
+                          _locationController.text.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ServiceLocationMap(
+                          locationName: _locationController.text,
+                          height: 150,
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       _buildCategoryDropdown(),
                       const SizedBox(height: 16),
                       _buildGuideSelector(),
                       const SizedBox(height: 24),
-                      const Text(
-                        'Images',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.images,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -443,7 +507,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                         children: [
                           Expanded(
                             child: _buildTextField(
-                              'Image URL',
+                              AppLocalizations.of(context)!.imageUrl,
                               _imageUrlController,
                             ),
                           ),
@@ -527,9 +591,9 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                             onPressed: _isLoading
                                 ? null
                                 : () => Navigator.of(context).pop(),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(color: Colors.white54),
+                            child: Text(
+                              AppLocalizations.of(context)!.cancel,
+                              style: const TextStyle(color: Colors.white54),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -557,7 +621,9 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
                                     ),
                                   )
                                 : Text(
-                                    widget.service != null ? 'Update' : 'Create',
+                                    widget.service != null
+                                        ? AppLocalizations.of(context)!.update
+                                        : AppLocalizations.of(context)!.create,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -582,7 +648,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       dropdownColor: AppColors.surfaceDark,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: 'Select Category*',
+        hintText: AppLocalizations.of(context)!.selectCategoryWithStar,
         hintStyle: const TextStyle(color: Colors.white38),
         filled: true,
         fillColor: Colors.white12,
@@ -622,9 +688,8 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       onTap: () async {
         final guide = await showDialog<User>(
           context: context,
-          builder: (context) => GuideSelectionDialog(
-            initialSelectedGuide: _selectedGuide,
-          ),
+          builder: (context) =>
+              GuideSelectionDialog(initialSelectedGuide: _selectedGuide),
         );
         if (guide != null) {
           setState(() => _selectedGuide = guide);
@@ -643,8 +708,10 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
             Expanded(
               child: Text(
                 _selectedGuide != null
-                    ? 'Guide: ${_selectedGuide!.name}'
-                    : 'Select Tour Guide (Optional)',
+                    ? AppLocalizations.of(
+                        context,
+                      )!.guideLabel(_selectedGuide!.name)
+                    : AppLocalizations.of(context)!.selectTourGuideOptional,
                 style: TextStyle(
                   color: _selectedGuide != null ? Colors.white : Colors.white38,
                 ),
@@ -665,15 +732,107 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
     );
   }
 
+  Widget _buildLocationPicker() {
+    return Autocomplete<String>(
+      initialValue: TextEditingValue(text: _locationController.text),
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<String>.empty();
+        }
+        return LocationMapper.supportedCities.where((String option) {
+          return option.contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: (String selection) {
+        setState(() {
+          _locationController.text = selection;
+          _showMapPreview = true;
+        });
+      },
+      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+        // Sync our controller with autocomplete controller
+        if (_locationController.text.isNotEmpty && controller.text.isEmpty) {
+          controller.text = _locationController.text;
+        }
+        controller.addListener(() {
+          if (_locationController.text != controller.text) {
+            _locationController.text = controller.text;
+          }
+        });
+
+        return TextField(
+          controller: controller,
+          focusNode: focusNode,
+          maxLength: 100,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context)!.locationPlaceholder,
+            hintStyle: const TextStyle(color: Colors.white38),
+            counterText: '', // Hide counter for cleaner UI
+            filled: true,
+            fillColor: Colors.white12,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _showMapPreview ? Icons.map : Icons.map_outlined,
+                color: _showMapPreview ? Colors.blueAccent : Colors.white38,
+                size: 20,
+              ),
+              onPressed: () =>
+                  setState(() => _showMapPreview = !_showMapPreview),
+            ),
+          ),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4.0,
+            color: AppColors.surfaceDark,
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: 352, // Match dialog width minus padding
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final String option = options.elementAt(index);
+                  return ListTile(
+                    title: Text(
+                      option[0].toUpperCase() + option.substring(1),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    onTap: () => onSelected(option),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTextField(
     String hint,
     TextEditingController controller, {
     bool isNumber = false,
     int maxLines = 1,
+    int? maxLength,
   }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      maxLength: maxLength ?? (isNumber ? 10 : 100),
       keyboardType: isNumber
           ? const TextInputType.numberWithOptions(decimal: true)
           : TextInputType.text,
@@ -681,6 +840,7 @@ class _CreateServiceDialogState extends ConsumerState<_CreateServiceDialog> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white38),
+        counterStyle: const TextStyle(color: Colors.white54, fontSize: 10),
         filled: true,
         fillColor: Colors.white12,
         border: OutlineInputBorder(

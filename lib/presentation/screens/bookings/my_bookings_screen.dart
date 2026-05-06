@@ -6,10 +6,13 @@ import 'package:flutter_tourism_app_26/core/theme/app_colors.dart';
 import 'package:flutter_tourism_app_26/core/widgets/aurora_background.dart';
 import 'package:flutter_tourism_app_26/data/models/booking_model.dart';
 import 'package:flutter_tourism_app_26/data/models/user_model.dart';
+import 'package:flutter_tourism_app_26/presentation/providers/auth/auth_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/providers/booking/booking_provider.dart';
 import 'package:flutter_tourism_app_26/presentation/screens/chat/chat_screen.dart';
+import 'package:flutter_tourism_app_26/presentation/screens/service/widgets/review_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flutter_tourism_app_26/core/extensions/l10n_extension.dart'; // Import the l10n extension
 
 class MyBookingsScreen extends ConsumerStatefulWidget {
   const MyBookingsScreen({super.key});
@@ -52,7 +55,7 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'My Bookings',
+                            context.l10n.myBookings, // Localized title
                             style: Theme.of(context).textTheme.displaySmall
                                 ?.copyWith(
                                   color: Colors.white,
@@ -80,7 +83,7 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Track and manage your trips',
+                                  context.l10n.trackManageTrips, // Localized subtitle
                                   style: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.8),
                                     fontSize: 12,
@@ -148,10 +151,10 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
-                    tabs: const [
-                      Tab(text: 'Upcoming'),
-                      Tab(text: 'Past'),
-                      Tab(text: 'Cancelled'),
+                    tabs: [
+                      Tab(text: context.l10n.upcoming), // Localized tab labels
+                      Tab(text: context.l10n.past),
+                      Tab(text: context.l10n.cancelled),
                     ],
                   ),
                 ),
@@ -170,27 +173,27 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                           _BookingList(
                             bookings: bookings,
                             status: 'confirmed',
-                            emptyMessage: 'No upcoming trips yet',
+                            emptyMessage: context.l10n.noUpcomingTrips, // Localized empty messages
                           ),
                           _BookingList(
                             bookings: bookings,
                             status: 'completed',
-                            emptyMessage: 'No past trips',
+                            emptyMessage: context.l10n.noPastTrips,
                           ),
                           _BookingList(
                             bookings: bookings,
                             status: 'cancelled',
-                            emptyMessage: 'No cancelled bookings',
+                            emptyMessage: context.l10n.noCancelledBookings,
                           ),
                         ],
                       ),
                       loading: () => const Center(
                         child: CircularProgressIndicator(color: Colors.white),
                       ),
-                      error: (err, _) => const Center(
+                      error: (err, _) => Center(
                         child: Text(
-                          'Failed to load bookings',
-                          style: TextStyle(color: Colors.white),
+                          context.l10n.failedLoadBookings, // Localized error message
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
@@ -298,7 +301,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Explore services to start your journey',
+            context.l10n.exploreToStart, // Localized call to action
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.5),
               fontSize: 14,
@@ -310,13 +313,13 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends ConsumerWidget {
   final Booking booking;
 
   const _BookingCard({required this.booking});
 
-  Color get _statusColor {
-    switch (booking.status.toLowerCase()) {
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
       case 'confirmed':
         return const Color(0xFF10B981); // Emerald
       case 'pending':
@@ -330,8 +333,8 @@ class _BookingCard extends StatelessWidget {
     }
   }
 
-  IconData get _statusIcon {
-    switch (booking.status.toLowerCase()) {
+  IconData _statusIcon(String status) {
+    switch (status.toLowerCase()) {
       case 'confirmed':
         return LucideIcons.circleCheck;
       case 'pending':
@@ -346,7 +349,7 @@ class _BookingCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -404,42 +407,68 @@ class _BookingCard extends StatelessWidget {
                               : null,
                         ),
                       ),
-                      Positioned(
-                        top: 16,
-                        left: 16,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _statusColor.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: _statusColor.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(_statusIcon, size: 12, color: Colors.white),
-                              const SizedBox(width: 6),
-                              Text(
-                                booking.status.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _statusColor(booking.status).withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _statusColor(booking.status).withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(_statusIcon(booking.status), size: 12, color: Colors.white),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      booking.status.toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              if (booking.tourGuide?.id == ref.watch(authNotifierProvider).user?.id) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.secondary.withValues(alpha: 0.9),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(LucideIcons.userCheck, size: 12, color: Colors.white),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'ASSIGNED TO ME',
+                                        style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
-                      ),
                       if (booking.tourGuide != null)
                         Positioned(
                           top: 16,
@@ -542,7 +571,7 @@ class _BookingCard extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              'View Details',
+                              context.l10n.viewDetails, // Localized action button
                               style: TextStyle(
                                 color: AppColors.primary.withValues(alpha: 0.9),
                                 fontSize: 12,
@@ -609,9 +638,9 @@ class _BookingCard extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Trip Details',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.tripDetails, // Localized modal title
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
@@ -714,56 +743,91 @@ class _BookingCard extends StatelessWidget {
                         const SizedBox(height: 40),
                         _buildDetailRow(
                           LucideIcons.info,
-                          'Status',
+                          context.l10n.status, // Localized label
                           booking.status.toUpperCase(),
-                          color: _statusColor,
+                          color: _statusColor(booking.status),
                           isBold: true,
                         ),
                         const Divider(height: 48, color: Colors.white10),
                         _buildDetailRow(
                           LucideIcons.calendar,
-                          'Check-in',
+                          context.l10n.checkIn, // Localized label
                           dateFormat.format(booking.dates.startDate),
                         ),
                         const SizedBox(height: 20),
                         _buildDetailRow(
                           LucideIcons.calendarCheck,
-                          'Check-out',
+                          context.l10n.checkOut, // Localized label
                           dateFormat.format(booking.dates.endDate),
                         ),
                         const Divider(height: 48, color: Colors.white10),
                         _buildDetailRow(
                           LucideIcons.wallet,
-                          'Total Amount',
+                          context.l10n.totalAmount, // Localized label
                           '\$${booking.totalPrice.toStringAsFixed(2)}',
                           isBold: true,
                           fontSize: 24,
                           color: AppColors.primary,
                         ),
                         
-                        if (booking.tourGuide != null) ...[
-                          const SizedBox(height: 40),
-                          const Row(
-                            children: [
-                              Icon(
-                                LucideIcons.userSearch,
-                                size: 16,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Your Tour Guide',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        // Role-based Context Card
+                        Consumer(builder: (context, ref, _) {
+                          final currentUserId = ref.watch(authNotifierProvider).user?.id;
+                          final isGuide = booking.tourGuide?.id == currentUserId;
+                          
+                          if (isGuide) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 40),
+                                Row(
+                                  children: [
+                                    const Icon(LucideIcons.user, size: 16, color: AppColors.secondary),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      context.l10n.assignedTraveler, // Localized label
+                                      style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildGuideCard(context, booking.tourGuide!, booking),
-                        ],
+                                const SizedBox(height: 16),
+                                _buildPersonCard(
+                                  context, 
+                                  booking.user!, 
+                                  context.l10n.traveler, // Localized role
+                                  AppColors.secondary, 
+                                  booking
+                                ),
+                              ],
+                            );
+                          } else if (booking.tourGuide != null) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 40),
+                                const Row(
+                                  children: [
+                                    Icon(LucideIcons.userSearch, size: 16, color: AppColors.primary),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Your Tour Guide',
+                                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                _buildPersonCard(
+                                  context, 
+                                  booking.tourGuide!, 
+                                  'Expert Guide', 
+                                  AppColors.primary, 
+                                  booking
+                                ),
+                              ],
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }),
 
                         const SizedBox(height: 40),
 
@@ -841,51 +905,101 @@ class _BookingCard extends StatelessWidget {
                         const SizedBox(height: 60),
 
                         // Action Buttons
-                        if (booking.status.toLowerCase() == 'pending' ||
-                            booking.status.toLowerCase() == 'confirmed')
-                          Consumer(
-                            builder: (context, ref, child) {
-                              return SizedBox(
-                                width: double.infinity,
-                                height: 60,
-                                child: ElevatedButton(
-                                  onPressed: () => _confirmCancellation(
-                                    context,
-                                    ref,
-                                    booking,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white.withValues(
-                                      alpha: 0.05,
-                                    ),
-                                    foregroundColor: const Color(0xFFEF4444),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                      side: const BorderSide(
-                                        color: Color(0xFFEF4444),
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(LucideIcons.trash2, size: 18),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        'Cancel My Trip',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16,
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final user = ref.watch(authNotifierProvider).user;
+                            final isTraveler = user?.role == 'user';
+                            final status = booking.status.toLowerCase();
+                            final canCancel = status == 'pending' || status == 'confirmed';
+                            final canReview = isTraveler && (status == 'confirmed' || status == 'completed');
+
+                            return Column(
+                              children: [
+                                if (canReview) ...[
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 60,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (context) => AddReviewSheet(
+                                            serviceId: booking.tourismService.id,
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
                                         ),
                                       ),
-                                    ],
+                                      child: const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(LucideIcons.star, size: 18),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Review My Trip',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
+                                  if (canCancel) const SizedBox(height: 16),
+                                ],
+                                if (canCancel)
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 60,
+                                    child: ElevatedButton(
+                                      onPressed: () => _confirmCancellation(
+                                        context,
+                                        ref,
+                                        booking,
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        foregroundColor: const Color(0xFFEF4444),
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
+                                          side: const BorderSide(
+                                            color: Color(0xFFEF4444),
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(LucideIcons.trash2, size: 18),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Cancel My Trip',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -1032,7 +1146,13 @@ class _BookingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildGuideCard(BuildContext context, User guide, Booking booking) {
+  Widget _buildPersonCard(
+    BuildContext context, 
+    User person, 
+    String subtitle, 
+    Color themeColor,
+    Booking booking
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1044,15 +1164,15 @@ class _BookingCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            backgroundImage: (guide.avatar != null && guide.avatar!.isNotEmpty)
-                ? NetworkImage(guide.avatar!)
+            backgroundColor: themeColor.withValues(alpha: 0.1),
+            backgroundImage: (person.avatar != null && person.avatar!.isNotEmpty)
+                ? NetworkImage(person.avatar!)
                 : null,
-            child: (guide.avatar == null || guide.avatar!.isEmpty)
+            child: (person.avatar == null || person.avatar!.isEmpty)
                 ? Text(
-                    guide.name[0].toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.primary,
+                    person.name[0].toUpperCase(),
+                    style: TextStyle(
+                      color: themeColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
@@ -1065,7 +1185,7 @@ class _BookingCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  guide.name,
+                  person.name,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -1074,7 +1194,7 @@ class _BookingCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Expert Guide',
+                  subtitle,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 13,
@@ -1094,7 +1214,7 @@ class _BookingCard extends StatelessWidget {
             },
             icon: const Icon(LucideIcons.messageCircle, color: Colors.white),
             style: IconButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: themeColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
