@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:label="flutter_tourism_app_26"
+        android:label="Seyaha"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

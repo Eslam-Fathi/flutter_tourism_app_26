@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "SeYaha Tourism",
+  "appTitle": "Seyaha",
   "@appTitle": {
     "description": "The title of the application"
   },
@@ -47,7 +47,7 @@
   "darkMode": "Dark Mode",
   "settings": "Settings",
   "helpSupport": "Help & Support",
-  "aboutApp": "About SeYaha",
+  "aboutApp": "About Seyaha",
   "logOut": "Log Out",
 
   "preferences": "Preferences",
