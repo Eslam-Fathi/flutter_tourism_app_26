@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// The title of the application
   ///
   /// In en, this message translates to:
-  /// **'SeYaha Tourism'**
+  /// **'Seyaha'**
   String get appTitle;
 
   /// No description provided for @explore.
@@ -341,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'About SeYaha'**
+  /// **'About Seyaha'**
   String get aboutApp;
 
   /// No description provided for @logOut.

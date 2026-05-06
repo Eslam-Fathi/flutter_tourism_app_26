@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'SeYaha Tourism';
+  String get appTitle => 'Seyaha';
 
   @override
   String get explore => 'Explore';
@@ -129,7 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpSupport => 'Help & Support';
 
   @override
-  String get aboutApp => 'About SeYaha';
+  String get aboutApp => 'About Seyaha';
 
   @override
   String get logOut => 'Log Out';

@@ -12,8 +12,14 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # 3. Enable Web support
 flutter config --enable-web
 
-# 4. Get dependencies
+# 4. Create a dummy .env if it doesn't exist (required by pubspec.yaml)
+if [ ! -f ".env" ]; then
+  echo "Creating dummy .env file..."
+  touch .env
+fi
+
+# 5. Get dependencies
 flutter pub get
 
-# 5. Build Web Release
-flutter build web --release
+# 5. Build Web Release (skipping wasm dry run for speed)
+flutter build web --release --no-wasm-dry-run
