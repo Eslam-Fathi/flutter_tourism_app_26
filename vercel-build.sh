@@ -21,5 +21,5 @@ fi
 # 5. Get dependencies
 flutter pub get
 
-# 6. Build Web Release (using HTML renderer for better compatibility)
-flutter build web --release --no-wasm-dry-run --web-renderer html
+# 6. Build Web Release
+flutter build web --release --web-renderer html
