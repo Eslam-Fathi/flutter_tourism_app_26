@@ -22,4 +22,4 @@ fi
 flutter pub get
 
 # 6. Build Web Release
-flutter build web --release --web-renderer html
+flutter build web --release --base-href /
