@@ -2,10 +2,12 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tourism_app_26/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/network/supabase_config.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/location_mapper.dart';
 import '../../../providers/admin/article_management_provider.dart';
 
 class CreateArticleDialog extends ConsumerStatefulWidget {
@@ -166,9 +168,9 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
 
               _buildTextField('Article Title', _titleController, Icons.title),
               const SizedBox(height: 16),
-              _buildTextField('Author Name', _authorController, Icons.person_outline),
+              _buildTextField(AppLocalizations.of(context)!.fullName, _authorController, Icons.person_outline),
               const SizedBox(height: 16),
-              _buildTextField('Location (e.g. Giza, Egypt)', _locationController, Icons.location_on_outlined),
+              _buildLocationDropdown(),
               const SizedBox(height: 16),
               _buildTextField('Article Content', _contentController, Icons.article_outlined, maxLines: 5, maxLength: 5000),
 
@@ -200,6 +202,49 @@ class _CreateArticleDialogState extends ConsumerState<CreateArticleDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLocationDropdown() {
+    final cities = LocationMapper.supportedCities;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Location',
+          style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _locationController.text.isEmpty ? null : _locationController.text.toLowerCase(),
+          dropdownColor: AppColors.surfaceDark,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.primary, size: 20),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.05),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          hint: const Text('Select City', style: TextStyle(color: Colors.white38)),
+          items: cities.map((city) {
+            return DropdownMenuItem(
+              value: city,
+              child: Text(
+                city.split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' '),
+              ),
+            );
+          }).toList(),
+          onChanged: (val) {
+            if (val != null) {
+              setState(() => _locationController.text = val);
+            }
+          },
+        ),
+      ],
     );
   }
 
