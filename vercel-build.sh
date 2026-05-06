@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # 1. Clone Flutter if it doesn't exist
 if [ ! -d "flutter" ]; then
@@ -23,3 +24,7 @@ flutter pub get
 
 # 6. Build Web Release
 flutter build web --release --base-href /
+
+# 7. Verify output
+echo "Build complete. Contents of build/web:"
+ls -F build/web

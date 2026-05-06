@@ -17,9 +17,33 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/network/supabase_config.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  await SupabaseConfig.init();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    // Load .env if it exists, but don't crash if it fails
+    try {
+      await dotenv.load(fileName: ".env");
+    } catch (e) {
+      debugPrint('Warning: Could not load .env file: $e');
+    }
+
+    // Initialize Supabase if config is available
+    try {
+      final url = dotenv.get('SUPABASE_URL', fallback: '');
+      final anonKey = dotenv.get('SUPABASE_ANON_KEY', fallback: '');
+      
+      if (url.isNotEmpty && anonKey.isNotEmpty) {
+        await SupabaseConfig.init();
+      } else {
+        debugPrint('Warning: Supabase credentials are empty. Skipping initialization.');
+      }
+    } catch (e) {
+      debugPrint('Error initializing Supabase: $e');
+    }
+  } catch (e) {
+    debugPrint('Fatal error during startup: $e');
+  }
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
