@@ -7,7 +7,7 @@ import 'interceptors/rate_limit_interceptor.dart';
 import 'interceptors/sanitization_interceptor.dart';
 
 class DioClient {
-  static String get baseUrl => dotenv.get('API_BASE_URL', fallback: 'https://se-yaha.vercel.app');
+  static String get baseUrl => dotenv.maybeGet('API_BASE_URL') ?? 'https://se-yaha.vercel.app';
   final TokenStorage _tokenStorage;
   late final Dio _dio;
 

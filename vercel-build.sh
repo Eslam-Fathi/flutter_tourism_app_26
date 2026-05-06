@@ -13,11 +13,14 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # 3. Enable Web support
 flutter config --enable-web
 
-# 4. Create a dummy .env if it doesn't exist (required by pubspec.yaml)
-if [ ! -f ".env" ]; then
-  echo "Creating dummy .env file..."
-  touch .env
-fi
+# 4. Create .env from Vercel Environment Variables
+echo "Creating .env file..."
+cat << EOF > .env
+SUPABASE_URL=$SUPABASE_URL
+SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+API_BASE_URL=$API_BASE_URL
+GEMINI_API_KEY=$GEMINI_API_KEY
+EOF
 
 # 5. Get dependencies
 flutter pub get

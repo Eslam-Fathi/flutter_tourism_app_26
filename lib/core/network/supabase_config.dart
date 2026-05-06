@@ -2,8 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseConfig {
-  static String get url => dotenv.get('SUPABASE_URL', fallback: '');
-  static String get anonKey => dotenv.get('SUPABASE_ANON_KEY', fallback: '');
+  static String get url => dotenv.maybeGet('SUPABASE_URL') ?? '';
+  static String get anonKey => dotenv.maybeGet('SUPABASE_ANON_KEY') ?? '';
 
   static Future<void> init() async {
     await Supabase.initialize(

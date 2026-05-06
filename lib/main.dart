@@ -19,23 +19,27 @@ import 'core/network/supabase_config.dart';
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
-    
-    // Load .env if it exists, but don't crash if it fails
+
+    // Load .env if it exists, otherwise initialize with empty state
     try {
       await dotenv.load(fileName: ".env");
     } catch (e) {
-      debugPrint('Warning: Could not load .env file: $e');
+      debugPrint('Warning: Could not load .env file, initializing empty: $e');
+      // Initialize with empty content to avoid "DotEnv has not been initialized" errors
+      await dotenv.load(fileName: '');
     }
 
     // Initialize Supabase if config is available
     try {
-      final url = dotenv.get('SUPABASE_URL', fallback: '');
-      final anonKey = dotenv.get('SUPABASE_ANON_KEY', fallback: '');
-      
+      final url = dotenv.maybeGet('SUPABASE_URL') ?? '';
+      final anonKey = dotenv.maybeGet('SUPABASE_ANON_KEY') ?? '';
+
       if (url.isNotEmpty && anonKey.isNotEmpty) {
         await SupabaseConfig.init();
       } else {
-        debugPrint('Warning: Supabase credentials are empty. Skipping initialization.');
+        debugPrint(
+          'Warning: Supabase credentials are empty. Skipping initialization.',
+        );
       }
     } catch (e) {
       debugPrint('Error initializing Supabase: $e');
@@ -81,7 +85,8 @@ class MyApp extends ConsumerWidget {
       case AuthStatus.authenticated:
         if (state.user?.role.toLowerCase() == 'admin') {
           return const AdminMainWrapper();
-        } else if (state.user?.role.toLowerCase() == 'company' || state.user?.role.toLowerCase() == 'manager') {
+        } else if (state.user?.role.toLowerCase() == 'company' ||
+            state.user?.role.toLowerCase() == 'manager') {
           return const CompanyMainWrapper();
         }
         return const MainWrapper();
