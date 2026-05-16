@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Deployed on Vercel](https://img.shields.io/badge/Web-Vercel-black?logo=vercel)](https://se-yaha.vercel.app)
 
-[🇺🇸 English](#-english) · [🇸🇦 العربية](#-العربية) · [📖 User Guide](./docs/USER_GUIDE.md)
+[🇺🇸 English](#-english) · [🇸🇦 العربية](#-العربية) · [📖 User Guide](./docs/USER_GUIDE.md) · [🏗️ Architecture & Concepts](./docs/ARCHITECTURE.md)
 
 </div>
 
@@ -87,6 +87,8 @@ Each role has a completely tailored navigation shell and feature set:
 ---
 
 ### 🏗️ Architecture
+
+> **Read the full [Architecture & Concepts Guide](./docs/ARCHITECTURE.md) for a deep dive into the tech stack, core concepts, and data flow.**
 
 The project follows **Clean Architecture** with three main layers:
 
